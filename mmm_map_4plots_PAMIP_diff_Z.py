@@ -21,8 +21,8 @@ from netCDF4 import Dataset
 
 if __name__ == '__main__':
         
-    exp1='12'
-    exp2='13'
+    exp1='11'
+    exp2='16'
     datapath1='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
     datapath2='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
    
@@ -97,6 +97,3 @@ if __name__ == '__main__':
     cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
     fig.colorbar(cs, cax=cbar_ax, orientation='vertical', extend='both',ticks=[-30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30])
     fig.savefig(datapath2+'mmm_'+paramname+'_'+exp2+'-'+exp1+'_map_diff.png')
-
-
-
