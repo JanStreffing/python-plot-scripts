@@ -87,5 +87,5 @@ cdict = {'red':   ((low_b,  		dummy, 		lo0[0]/norm),
                    (hi_b,  		hi1[2]/norm, 	dummy))
      	}
 
-cmap_TR = LinearSegmentedColormap('TR', cdict, 17) #255
+cmap_TR = LinearSegmentedColormap('TR', cdict, 15) #255
 plt.register_cmap(cmap=cmap_TR)

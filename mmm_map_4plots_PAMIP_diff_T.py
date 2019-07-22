@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 
-exp1='12'
-exp2='13'
+exp1='11'
+exp2='16'
 datapath='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
 
 param='T'

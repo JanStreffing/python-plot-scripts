@@ -31,14 +31,12 @@ mi1_color='FFFFFF' # white
 mi0_color='99EBFF' # light blue
 lo1_color= '333399' # lila
 lo0_color= 'CC0099' # violet
-# define position of middle color (mi1)
-pos_mid=0.5
 # place mi2 & mi0 relative to mi1
-dx_up=0.1
-dx_do=-0.1
+dx_up=0.2
+dx_do=-0.4
 # place hi0 and lo1 relative to hi1 and lo0
-lo_up=0.2
-hi_do=-0.25
+lo_up=0.001
+hi_do=-0.7
 
 # ------------------------------------------------------------------------ #
 
@@ -62,30 +60,21 @@ hi_b=1.0
 #			colorbar	RGB-color if	RGB-color if
 #	           	 level		 value<level	 value>level
 
-cdict = {'red':   ((low_b,  		dummy, 		lo0[0]/norm),
-		   (low_b+lo_up,  	lo1[0]/norm, 	lo1[0]/norm),
-                   (pos_mid+dx_do,  	mi0[0]/norm, 	mi0[0]/norm),
-	           (pos_mid,  		mi1[0]/norm, 	mi1[0]/norm),
-		   (pos_mid+dx_up,  	mi2[0]/norm, 	mi2[0]/norm),
-		   (hi_b+hi_do,  	hi0[0]/norm, 	hi0[0]/norm),
-                   (hi_b,  		hi1[0]/norm, 	dummy)),
+cdict = {'red':   ((low_b,  		dummy,	 	mi1[0]/norm),
+		   (low_b+lo_up,  	mi2[0]/norm, 	mi2[0]/norm),
+                   (hi_b+hi_do,   	hi0[0]/norm, 	hi0[0]/norm),
+	           (hi_b,  		hi1[0]/norm, 	dummy)),
 
-         'green': ((low_b,  		dummy, 		lo0[1]/norm),
-		   (low_b+lo_up,  	lo1[1]/norm, 	lo1[1]/norm),
-		   (pos_mid+dx_do,  	mi0[1]/norm, 	mi0[1]/norm),
-                   (pos_mid,  		mi1[1]/norm, 	mi1[1]/norm),
-		   (pos_mid+dx_up,  	mi2[1]/norm, 	mi2[1]/norm),
-		   (hi_b+hi_do,  	hi0[1]/norm, 	hi0[1]/norm),
-            	   (hi_b,  		hi1[1]/norm, 	dummy)),
+         'green': ((low_b,  		dummy,	 	mi1[1]/norm),
+		   (low_b+lo_up,  	mi2[1]/norm, 	mi2[1]/norm),
+                   (hi_b+hi_do,   	hi0[1]/norm, 	hi0[1]/norm),
+	           (hi_b,  		hi1[1]/norm, 	dummy)),
 
-         'blue':  ((low_b,  		dummy, 		lo0[2]/norm),
-		   (low_b+lo_up,  	lo1[2]/norm, 	lo1[2]/norm),
-		   (pos_mid+dx_do,  	mi0[2]/norm, 	mi0[2]/norm),
-                   (pos_mid,  		mi1[2]/norm, 	mi1[2]/norm),
-		   (pos_mid+dx_up,  	mi2[2]/norm, 	mi2[2]/norm),
-		   (hi_b+hi_do,  	hi0[2]/norm, 	hi0[2]/norm),
-                   (hi_b,  		hi1[2]/norm, 	dummy))
+         'blue':  ((low_b,  		dummy,	 	mi1[2]/norm),
+		   (low_b+lo_up,  	mi2[2]/norm, 	mi2[2]/norm),
+                   (hi_b+hi_do,   	hi0[2]/norm, 	hi0[2]/norm),
+	           (hi_b,  		hi1[2]/norm, 	dummy)),
      	}
 
-cmap_TR = LinearSegmentedColormap('TR', cdict, 17) #255
-plt.register_cmap(cmap=cmap_TR)
+cmap_red = LinearSegmentedColormap('red', cdict, 36) #255
+plt.register_cmap(cmap=cmap_red)

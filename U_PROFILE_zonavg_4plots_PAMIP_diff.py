@@ -14,6 +14,7 @@ res='T511'
 datapath1='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp1+'/ensemble_mean/'
 datapath2='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp2+'/ensemble_mean/'
 
+
 param='U'
 paramname='U'
 paramunit='[m/s]'
@@ -28,7 +29,7 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
    print ncfile1
    ncfile2 = datapath2+param+'_ensmean'+season+'.nc'
    print ncfile2
-	 
+
    f = netcdf.netcdf_file(ncfile1, 'r')
    data1  = np.copy(f.variables[param].data)
    lats=np.copy(f.variables['lat'].data)
@@ -61,8 +62,10 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
 
    ax=plt.subplot(2,2,plotspot)
    plt.tight_layout(pad=2.5)
-
-   levels=[-1, -0.75, -0.5, -0.25, -0.1, 0.1, 0.25, 0.5, 0.75, 1]
+   if param == 'U':
+      levels=[-1, -0.75, -0.5, -0.25, -0.1, 0.1, 0.25, 0.5, 0.75, 1]
+   else:
+      levels=[-0.6, -0.4, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.4, 0.6]
 	    
    im=plt.contourf(lats, levs/100, res1, levels=levels, cmap=cmap_TR, extend='both')
 #   levels=[0.05]

@@ -3,21 +3,20 @@ from colorbar_TR import cmap_TR
 import numpy as np
 from scipy.io import netcdf
 import scipy.stats as stats
-
+import matplotlib as m
 import matplotlib.pyplot as plt
-
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 
-exp1='12'
-exp2='13'
-res='T511'
-datapath1='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp1+'/ensemble_mean/'
-datapath2='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp2+'/ensemble_mean/'
+exp1='11'
+exp2='16'
+res='T159_and_T511'
+datapath1='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
+datapath2='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
 
-param='T'
-paramname='T'
-paramunit='[K]'
+param='U'
+paramname='U'
+paramunit='[m/s]'
 #season='winter'
 
 itimes=0
@@ -25,9 +24,9 @@ fig = figure()
 
 for season in ['_DJF', '_MAM', '_JJA', '_SON']:
 
-   ncfile1 = datapath1+param+'_ensmean'+season+'.nc'
+   ncfile1 = datapath1+res+'_'+param+season+'_'+exp1+'_ensmean.nc'
    print ncfile1
-   ncfile2 = datapath2+param+'_ensmean'+season+'.nc'
+   ncfile2 = datapath2+res+'_'+param+season+'_'+exp2+'_ensmean.nc'
    print ncfile2
 	 
    f = netcdf.netcdf_file(ncfile1, 'r')
@@ -62,9 +61,8 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
 
    ax=plt.subplot(2,2,plotspot)
    plt.tight_layout(pad=2.5)
-
-   if param == 'T':
-      levels=[-2, -1.5, -1, -0.5, -0.2, 0.2, 0.5, 1, 1.5, 2]
+   if param == 'U':
+      levels=[-1, -0.75, -0.5, -0.25, -0.1, 0.1, 0.25, 0.5, 0.75, 1]
    else:
       levels=[-0.6, -0.4, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.4, 0.6]
 	    
@@ -77,7 +75,7 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
    plt.xlim([20,89])
    
    levels=np.arange(-80, 60, 4)
-   cs=plt.contour(lats, levs/100, resc-273.15, levels=levels, colors='k')
+   cs=plt.contour(lats, levs/100, resc, levels=levels, colors='k')
    plt.clabel(cs, inline=1, fontsize=7, fmt='%2.0f')
    
    if ( itimes == 0 or itimes == 2 ):

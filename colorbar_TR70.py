@@ -34,11 +34,11 @@ lo0_color= 'CC0099' # violet
 # define position of middle color (mi1)
 pos_mid=0.5
 # place mi2 & mi0 relative to mi1
-dx_up=0.1
-dx_do=-0.1
+dx_up=0.02
+dx_do=-0.04
 # place hi0 and lo1 relative to hi1 and lo0
 lo_up=0.2
-hi_do=-0.25
+hi_do=-0.4
 
 # ------------------------------------------------------------------------ #
 
@@ -87,5 +87,5 @@ cdict = {'red':   ((low_b,  		dummy, 		lo0[0]/norm),
                    (hi_b,  		hi1[2]/norm, 	dummy))
      	}
 
-cmap_TR = LinearSegmentedColormap('TR', cdict, 17) #255
+cmap_TR = LinearSegmentedColormap('TR', cdict, 71) #255
 plt.register_cmap(cmap=cmap_TR)
