@@ -15,7 +15,7 @@ paramobsintern='var129'
 paramlongname='500 hPa geopotential height [m]'
 timerangemodel=''
 timerangeobs='1957_2002'
-modelname='OIFS_T159_11'
+modelname='OIFS_T511_11'
 obsname='ERA40'
 modelfac=1./9.81
 obsfac=0.102
@@ -23,7 +23,7 @@ levels=[5000, 5100, 5200, 5300, 5400, 5500, 5600, 5700, 5800]
 levelsdiff=[-100, -70, -50, -30, -10, 10, 30, 50, 70, 100]
 
 
-datapath='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/T159/Experiment_11/ensemble_mean/'
+datapath='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/T511/Experiment_11/ensemble_mean_lr/'
 
 cdict1= {'red':   ((0.0,  1.0, 1.0),
                    (0.3,  1.0, 1.0),

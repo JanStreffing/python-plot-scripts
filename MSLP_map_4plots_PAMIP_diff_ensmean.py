@@ -21,8 +21,8 @@ from netCDF4 import Dataset
 
 if __name__ == '__main__':
         
-    exp1='12'
-    exp2='13'
+    exp1='11'
+    exp2='16'
     res='T511'
     datapath1='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/large/'
     datapath2='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/large/'
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     fig.subplots_adjust(left=0.01, right=0.85, bottom=0, top=0.98, wspace = 0.1, hspace=0.0)
     cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
     fig.colorbar(cs, cax=cbar_ax, orientation='vertical', extend='both',ticks=[-300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300])
-    fig.savefig(datapath_out+paramname+'_'+exp2+'-'+exp1+'_'+res+'_ensmean_map_diff.png')
+    fig.savefig(datapath_out+paramname+'_'+exp2+'-'+exp1+'_ensmean_map_diff.png')
 
 
 

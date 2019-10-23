@@ -9,10 +9,10 @@ import numpy as np
 datapath='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/'
 modelfactor=9.81
 
-textfile11=datapath+'sinuosity_Experiment_11T159_NH.txt'
-textfile12=datapath+'sinuosity_Experiment_12T159_NH.txt'
-textfile13=datapath+'sinuosity_Experiment_13T159_NH.txt'
-textfile16=datapath+'sinuosity_Experiment_16T159_NH.txt'
+textfile11=datapath+'sinuosity_Experiment_11T511_NH.txt'
+textfile12=datapath+'sinuosity_Experiment_12T511_NH.txt'
+textfile13=datapath+'sinuosity_Experiment_13T511_NH.txt'
+textfile16=datapath+'sinuosity_Experiment_16T511_NH.txt'
 
 sinuosity11=np.zeros(12)
 sinuosity12=np.zeros(12)
@@ -97,12 +97,12 @@ ax.xaxis.set_minor_formatter(mdates.DateFormatter("%m"))
 
 #matplotlib.pylab.ylim([1,2])
 
-fig.suptitle("Isohypse value Northern Hemisphere PAMIP T159")
+fig.suptitle("Isohypse value Northern Hemisphere PAMIP T511")
 plt.xlabel("Month")
 
 plt.legend([plot11,plot12,plot13,plot16],["11:pdSST-pdSIC","12:piSST-piSIC","13:piSST-pdSIC","16:pdSST-fuSICArc"],loc=1,prop={'size':10})
 
-fig.savefig(datapath+'isohypse_t159.png')
+fig.savefig(datapath+'isohypse_t511.png')
 
 plt.show()
 

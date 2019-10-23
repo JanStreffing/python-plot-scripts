@@ -8,14 +8,13 @@ from mpl_toolkits.basemap import Basemap
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 
-res='T511'
 parammodel='3D'
 parammodelintern='Z'
 paramobs='3D'
 paramobsintern='Z'
 paramlongname='Synoptic activity 500 hPa [m]'
-modelname='13'
-obsname='12'
+modelname='16'
+obsname='11'
 modelfac=1.
 obsfac=1.
 levels=[0, 10, 20, 40, 60, 80, 100, 140]

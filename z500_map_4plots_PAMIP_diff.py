@@ -23,7 +23,7 @@ if __name__ == '__main__':
         
     exp1='12'
     exp2='13'
-    res='T159'
+    res='T511'
     gravityfactor=9.81
     datapath1='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp1+'/ensemble_mean/'
     datapath2='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp2+'/ensemble_mean/'

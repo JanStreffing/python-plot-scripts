@@ -7,7 +7,7 @@ Created on Fri Apr 26 13:12:45 2019
 """
 
 import sys
-from colorbar_TR import cmap_TR
+from colorbar_TR70 import cmap_TR
 import numpy as np
 from scipy.io import netcdf
 import scipy.stats as stats
@@ -21,8 +21,8 @@ from netCDF4 import Dataset
 
 if __name__ == '__main__':
         
-    exp1='12'
-    exp2='13'
+    exp1='11'
+    exp2='16'
     res='T159'
     datapath1='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp1+'/ensemble_mean/'
     datapath2='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp2+'/ensemble_mean/'

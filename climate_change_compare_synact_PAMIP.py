@@ -8,7 +8,7 @@ from mpl_toolkits.basemap import Basemap
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 
-res='T159'
+res='T511'
 parammodel='3D'
 parammodelintern='Z'
 paramobs='3D'
@@ -91,7 +91,7 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
    cbar=map.colorbar(im,"bottom", size="5%", pad="2%")
    #plt.title(paramlongname+' '+obsname+' '+timerangeobs+' '+season[1:4])
 
-   fig.savefig(datapath1+'SYNACT_'+obsname+season+'.png')
+   fig.savefig(datapath1+'SYNACT_'+res+'_'+obsname+season+'.png')
    
    fig = figure()
 
@@ -107,7 +107,7 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
    cbar=map.colorbar(im,"bottom", size="5%", pad="2%")
    #plt.title(paramlongname+' '+modelname+' '+timerangemodel+' '+season[1:4])
 
-   fig.savefig(datapath2+'SYNACT_'+modelname+season+'.png')
+   fig.savefig(datapath2+'SYNACT_'+res+'_'+modelname+season+'.png')
 
    fig = figure()
 
@@ -123,4 +123,4 @@ for season in ['_DJF', '_MAM', '_JJA', '_SON']:
    cbar=map.colorbar(im,"bottom", size="5%", pad="2%")
    #plt.title(paramlongname+' '+modelname+'-'+obsname+' '+season[1:4])
 
-   fig.savefig(datapath2+'SYNACT_'+modelname+'-'+obsname+season+'.png')
+   fig.savefig(datapath2+'SYNACT_'+res+'_'+modelname+'-'+obsname+season+'.png')

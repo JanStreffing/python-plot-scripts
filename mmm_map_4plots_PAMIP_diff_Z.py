@@ -21,8 +21,8 @@ from netCDF4 import Dataset
 
 if __name__ == '__main__':
         
-    exp1='11'
-    exp2='16'
+    exp1='12'
+    exp2='13'
     datapath1='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
     datapath2='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
    
