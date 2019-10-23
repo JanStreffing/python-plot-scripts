@@ -7,7 +7,7 @@ Created on Fri Apr 26 13:12:45 2019
 """
 
 import sys
-from colorbar_TR import cmap_TR
+from colorbar_TR_15 import cmap_TR
 import numpy as np
 from scipy.io import netcdf
 import scipy.stats as stats
@@ -21,12 +21,12 @@ from netCDF4 import Dataset
 
 if __name__ == '__main__':
         
-    exp1='12'
-    exp2='13'
-    res='T511'
-    datapath1='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp1+'/ensemble_mean/'
-    datapath2='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/'+res+'/Experiment_'+exp2+'/ensemble_mean/'
-    
+    exp1='11'
+    exp2='16'
+    res='T159'
+    datapath1='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
+    datapath2='/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/'
+
     
     param='Z'
     paramname='z500'
@@ -36,8 +36,8 @@ if __name__ == '__main__':
     
     for season in ['_DJF', '_MAM', '_JJA', '_SON']:
     
-       ncfile1 = datapath1+paramname+'_ensmean'+season+'.nc'
-       ncfile2 = datapath2+paramname+'_ensmean'+season+'.nc'
+       ncfile1 = datapath1+res+'_'+paramname+season+'_'+exp1+'_ensmean_50000Pa.nc'
+       ncfile2 = datapath2+res+'_'+paramname+season+'_'+exp2+'_ensmean_50000Pa.nc'
        print ncfile1
        print ncfile2
     
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     
        # Add Coastlines, States, and Country Boundaries
        m.drawcoastlines()
-       m.drawparallels(np.arange(-90.,120.,45.))
+       m.drawparallels(np.arange(-90.,120.,30.))
        m.drawmeridians(np.arange(0.,360.,90.))
     
        if ( itimes == 0 ):
