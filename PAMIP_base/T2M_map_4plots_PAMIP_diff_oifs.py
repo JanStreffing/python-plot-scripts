@@ -7,7 +7,6 @@ Created on Fri Apr 26 13:12:45 2019
 """
 
 import sys
-from colorbar_TR70 import cmap_TR
 import numpy as np
 from scipy.io import netcdf
 import scipy.stats as stats
