@@ -34,8 +34,9 @@ import Ngl
 
 np.random.seed(12345678)
 
+
 if str(sys.argv[9]) == "true":
-	print("hashing insignifcant changes")
+	print("hashing signifcant changes")
 
 
 if __name__ == '__main__':
@@ -46,9 +47,10 @@ if __name__ == '__main__':
     outpath=str(sys.argv[8])
     datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
     datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
-    if str(sys.argv[9]) == "true":
-       datapath3=outpath+'/large/'
+    datapath3=basepath+res+'/Experiment_'+exp1+'/'
+    datapath4=basepath+res+'/Experiment_'+exp2+'/'    
     
+
     if str(sys.argv[11]) == "colorbar_TR_15":
        from colorbar_TR_15 import cmap_TR
     if str(sys.argv[11]) == "colorbar_TR_70":
@@ -57,31 +59,45 @@ if __name__ == '__main__':
     param=str(sys.argv[4])
     paramname=str(sys.argv[5])
     mapticks=map(float, sys.argv[10].split(','))
-    
+
     itimes=0
     fig = plt.figure(figsize=(8,8))
     
     for season in ['_DJF', '_MAM', '_JJA', '_SON']:
-    
+
+       dataset3=[]
+       dataset4=[]
+       data3=[]
+       data4=[]
+
+       # Reading netcdf files
        ncfile1 = datapath1+paramname+'_ensmean'+season+'.nc'
        ncfile2 = datapath2+paramname+'_ensmean'+season+'.nc'
-       if str(sys.argv[9]) == "true":
-          ncfile3 = datapath3+res+'_ensstd_'+paramname+season+'_'+exp1+'-'+exp2+'.nc'
-          print ncfile3
-       print ncfile1
-       print ncfile2
-    
-    
        dataset1 = Dataset(ncfile1) 
        dataset2 = Dataset(ncfile2) 
+       print ncfile1
+       print ncfile2
+
        if str(sys.argv[9]) == "true":
-          dataset3 = Dataset(ncfile3) 
+          for i in range(100):
+             ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+season+'.nc'
+             ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+season+'.nc'
+             print ncfile3
+             dataset3.append(Dataset(ncfile3))
+             dataset4.append(Dataset(ncfile4))
+
        
        # Loading data from datasets
        data1 = dataset1.variables[param][:]
        data2 = dataset2.variables[param][:]
        if str(sys.argv[9]) == "true":
-          data3 = dataset3.variables[param][:]
+          for i in range(100):
+             data3.append(dataset3[i].variables[param][:])
+             data4.append(dataset4[i].variables[param][:])
+
+
+       # Calculating Welch T-test
+       welch = stats.ttest_ind(data3,data4)
 
        # in case data has multiple levels, select only the 6th one (50000 hPa)
        print(np.squeeze(data1).shape)
@@ -98,8 +114,8 @@ if __name__ == '__main__':
        ds1,ds2 = np.hsplit(np.squeeze(data2),2)
        data_cat2 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
        if str(sys.argv[9]) == "true":
-          ds1,ds2 = np.hsplit(np.squeeze(data3),2)
-          data_cat3 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
+          ds1,ds2 = np.hsplit(np.squeeze(welch[1]),2)
+          data_cat3 = np.concatenate((ds2,ds1),axis=1)
 
 
        # Loading coords, turning longitude coordiante by 180° to Prime meridian
@@ -115,7 +131,7 @@ if __name__ == '__main__':
 
        # Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
        if str(sys.argv[9]) == "true":
-          data4 = data_cat3 < np.absolute(data_cat2-data_cat1)
+          data4 = data_cat3 < 0.05
 
 
        # Set position of subplot and some general settings for cartopy
