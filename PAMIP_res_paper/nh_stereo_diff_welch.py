@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 26 13:12:45 2019
+Created on Fri Apr 26 13:12:45 100100
 
 @author: jstreffi-local
 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     itimes=0
     fig = plt.figure(figsize=(8,8))
     
-    for season in ['_DJF', '_MAM', '_JJA', '_SON']:
+    for season in ['_DJF','_MAM', '_JJA', '_SON']:
 
        dataset3=[]
        dataset4=[]
@@ -98,6 +98,8 @@ if __name__ == '__main__':
 
        # Calculating Welch T-test
        welch = stats.ttest_ind(data3,data4)
+       print(np.isnan(data3).any())
+       print(np.isnan(data4).any())
 
        # in case data has multiple levels, select only the 6th one (50000 hPa)
        print(np.squeeze(data1).shape)
@@ -116,7 +118,6 @@ if __name__ == '__main__':
        if str(sys.argv[9]) == "true":
           ds1,ds2 = np.hsplit(np.squeeze(welch[1]),2)
           data_cat3 = np.concatenate((ds2,ds1),axis=1)
-
 
        # Loading coords, turning longitude coordiante by 180° to Prime meridian
        lons = dataset1.variables[u'lon'][:]-180

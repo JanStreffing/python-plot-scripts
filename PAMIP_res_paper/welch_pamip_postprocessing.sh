@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M # z500 MSL # T2M MSL U V
+for todo in NAO #SD T2M z500 MSL MSL U V synact
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -60,6 +60,15 @@ do
         if [[ "$todo" == "synact" ]]; then
                 python nh_stereo_diff_welch.py 11 16 T159 Z synact $in_mistral 9.81 $out_mistral true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
                 python nh_stereo_diff_welch.py 11 16 T511 Z synact $in_mistral 9.81 $out_mistral true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
+        fi
+
+	if [[ "$todo" == "SD" ]]; then
+                python nh_stereo_diff_welch.py 11 16 T159 SD SD $in_mistral 0.01 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18
+                python nh_stereo_diff_welch.py 11 16 T511 SD SD $in_mistral 0.01 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18
+	fi
+
+        if [[ "$todo" == "NAO" ]]; then
+                python nao_diff.py 11 16 T159 MSL MSL $in_mistral 1 $out_mistral false -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18
         fi
 
 
