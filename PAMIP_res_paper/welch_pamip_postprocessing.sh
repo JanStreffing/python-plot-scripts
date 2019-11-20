@@ -68,7 +68,10 @@ do
 	fi
 
         if [[ "$todo" == "NAO" ]]; then
-                python nao_diff.py 11 16 T159 MSL MSL $in_mistral 1 $out_mistral false -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18
+		python nao_ngl_diff.py 11 16 T159 MSL MSL $in_mistral 1 $out_mistral false -0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8
+                python nao_ngl.py 11 16 T159 MSL MSL $in_mistral 1 $out_mistral false -0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8
+                python nao_ngl.py 11 16 T159 MSL MSL $in_mistral 1 $out_mistral false -0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8
+
         fi
 
 
