@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 26 13:12:45 2019
+Created on Fri Apr 26 13:12:45 2040
 
 @author: jstreffi-local
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
        print ncfile2
 
        if str(sys.argv[9]) == "true":
-          for i in range(100):
+          for i in range(40):
              ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+season+'.nc'
              ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+season+'.nc'
              print ncfile3
@@ -91,7 +91,7 @@ if __name__ == '__main__':
        data1 = dataset1.variables[param][:]
        data2 = dataset2.variables[param][:]
        if str(sys.argv[9]) == "true":
-          for i in range(100):
+          for i in range(40):
              data3.append(dataset3[i].variables[param][:])
              data4.append(dataset4[i].variables[param][:])
 
@@ -171,7 +171,7 @@ fig.subplots_adjust(left=0.01, right=0.85, bottom=0, top=0.98, wspace = 0.1, hsp
 cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+res+'_map_diff.png')
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+res+'_map_diff_40member.png')
 
 
 

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 module unload python
+#conda activate pyn_env_py2
 
-input="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/"
+input="/p/largedata/hhb19/jstreffi/runtime/oifsamip/"
 output="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/output/"
 
 
@@ -21,39 +22,39 @@ output="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/output/"
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M # z500 MSL # T2M MSL U V
+for todo in z500 MSL U T2M
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T1279 Z z500 $input 9.81 $output false -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 18
+		python nh_stereo_diff_welch.py 11 16 T1279 Z z500 $input 9.81 $output true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 18
 	fi
 
 
 	# t2m hPa polar plots 
 	if [[ "$todo" == "T2M" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T1279 T2M T2M $input 1 $output false -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
+		python nh_stereo_diff_welch.py 11 16 T1279 T2M T2M $input 1 $output true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
 	fi
 
 
 	# MSL polar plots
 	if [[ "$todo" == "MSL" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T1279 MSL MSL $input 1 $output false -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 16
+		python nh_stereo_diff_welch.py 11 16 T1279 MSL MSL $input 1 $output true -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 16
 	fi
 
 
 	# U polar plots
 	if [[ "$todo" == "U" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T1279 U U $input 1 $output false -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18
+		python nh_stereo_diff_welch.py 11 16 T1279 U U $input 1 $output true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18
 	fi
 
         # V polar plots
         if [[ "$todo" == "V" ]]; then
-                python nh_stereo_diff_welch.py 11 16 T1279 V V $input 1 $output false -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18
+                python nh_stereo_diff_welch.py 11 16 T1279 V V $input 1 $output true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18
         fi
 
         # synoptic activity polar plots
         if [[ "$todo" == "synact" ]]; then
-                python nh_stereo_diff_welch.py 11 16 T1279 Z synact $input 9.81 $output false -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
+                python nh_stereo_diff_welch.py 11 16 T1279 Z synact $input 9.81 $output true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18
         fi
 
 
