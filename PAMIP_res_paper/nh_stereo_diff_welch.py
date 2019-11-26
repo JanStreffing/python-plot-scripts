@@ -107,8 +107,8 @@ if __name__ == '__main__':
        if (len(np.squeeze(data1).shape)) == 3:
           data1 = data1[0,5,:,:]
           data2 = data2[0,5,:,:]
-          data3 = data3[0,5,:,:]
-
+          for i in range(100):
+             data3[i] =  data3[i][0,5,:,:]
 
        # Split data and concatenate in reverse order to turn by 180° to Prime meridian
        ds1,ds2 = np.hsplit(np.squeeze(data1),2)

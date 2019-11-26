@@ -8,6 +8,7 @@ Jan Streffing	 	2019-10-25	adapted from DKRZ example to fit PAMIP plotting
 '''
  
 from __future__ import print_function
+import sys
 import xarray as xr
 import numpy as np
 import Ngl, os
@@ -61,7 +62,7 @@ def add_lon_labels(wks,map,res):
 
 #-- Loop through each label and add it.
   txres = Ngl.Resources()
-  txres.txFontHeightF = 0.01
+  txres.txFontHeightF = 0.02
   for i in range(nlon):
       txres.txJust = just_strs[i]
       Ngl.text_ndc(wks,lon_labels[i],xndc[i],yndc[i],txres)
@@ -84,7 +85,7 @@ def add_labels_lcm(wks,map,dlat,dlon):
      HEMISPHERE = "SH"
 
 #-- pick some "nice" values for the latitude labels.
-  lat_values = np.arange(int(minlat),int(maxlat),10)
+  lat_values = np.arange(int(minlat),int(maxlat),20)
   lat_values = lat_values.astype(float)
   nlat       = len(lat_values)
 
@@ -104,7 +105,7 @@ def add_labels_lcm(wks,map,dlat,dlon):
   
 #-- set some text resources
   txres               = Ngl.Resources()
-  txres.txFontHeightF = 0.01
+  txres.txFontHeightF = 0.02
   txres.txPosXF       = 0.1
 
 #-- Loop through lat values, and attach labels to the left and right edges of
@@ -151,7 +152,7 @@ def add_labels_lcm(wks,map,dlat,dlon):
   txres.txPosYF = -5.0
 
 #-- pick some "nice" values for the longitude labels
-  lon_values = np.arange(int(minlon+10),int(maxlon-10),10).astype(float)
+  lon_values = np.arange(int(minlon+10),int(maxlon-10),20).astype(float)
   lon_values = np.where(lon_values > 180, 360-lon_values, lon_values)
   nlon       = lon_values.size
 
@@ -207,38 +208,37 @@ def add_labels_lcm(wks,map,dlat,dlon):
 #----------------------------------------------------------------------
 #-- config
 
-res                          =  Ngl.Resources()         #-- resource object
 
 exp1=str(sys.argv[1])
 exp2=str(sys.argv[2])
-res=str(sys.argv[3])
+reso=str(sys.argv[3])
 basepath=str(sys.argv[6])
 outpath=str(sys.argv[8])
-datapath1=basepath+res+'/Experiment_'+exp1+'/nao/'
-datapath2=basepath+res+'/Experiment_'+exp2+'/nao/'
+datapath1=basepath+reso+'/Experiment_'+exp1+'/nao/'
+datapath2=basepath+reso+'/Experiment_'+exp2+'/nao/'
 param=str(sys.argv[4])
 paramname=str(sys.argv[5])
 levels=map(float, sys.argv[10].split(','))
 
+name=paramname+'_'+exp2+'_'+exp1+'_'+reso+'_nao_diff'
+print(name)
 
-wks = Ngl.open_wks('png','nao',res)   #-- send graphics to PNG file
-Ngl.define_colormap(wks,'BlueDarkRed18')        #-- define colormap
+wks = Ngl.open_wks('png',name)   #-- send graphics to PNG file
+Ngl.define_colormap(wks,'temp_diff_18lev')        #-- define colormap
 
 #-- contour levels, labels and colors
-#levels = [-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
-#levels = [-7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7]
-#levels = [-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30]
-labels = [str(i) for i in levels] 
+reducedlevels = -3,-2,-1,-.4,-.1,.1,.4,1,2,3 
+labels = [str(i) for i in reducedlevels] 
 colors = range(2,len(levels)+2)
 
 #-----------------------------------
 #-- first plot: Lambert Conformal
 #-----------------------------------
 #-- northern hemisphere
-minlon = -89.                                           #-- min lon to mask
-maxlon =  39.                                           #-- max lon to mask
-minlat =  21.                                           #-- min lat to mask
-maxlat =  79.                                           #-- max lat to mask
+minlon = -90.                                           #-- min lon to mask
+maxlon =  40.                                           #-- max lon to mask
+minlat =  20.                                           #-- min lat to mask
+maxlat =  80.                                           #-- max lat to mask
 
 mpres                        =  Ngl.Resources()         #-- resource object
 mpres.nglMaximize            =  True
@@ -255,9 +255,8 @@ mpres.mpDataSetName          = 'Earth..4'               #-- change map data set
 mpres.mpDataBaseVersion      = 'MediumRes'              #-- choose higher map resolution
 
 mpres.tiMainOffsetYF         =  0.05
-mpres.tiMainFontHeightF      =  0.016                   #-- decrease font size
-
-#mpres.trGridType             =  "TriangularMesh"	#-- data contains missval
+mpres.tiMainOffsetXF         =  0.05
+mpres.lbLabelFontHeightF     =  0.0165
 
 mpres.mpProjection           = "LambertConformal"
 mpres.nglMaskLambertConformal = True                    #-- turn on lc masking
@@ -270,7 +269,7 @@ mpres.mpMaxLonF              =  maxlon
 mpres.mpMinLatF              =  minlat
 mpres.mpMaxLatF              =  maxlat
 mpres.mpGridAndLimbOn        =  True
-mpres.mpGridSpacingF         =  10.
+mpres.mpGridSpacingF         =  20.
 
 mpres.cnFillOn               =  True                    #-- turn contour fill on
 mpres.cnLinesOn              =  False                   #-- turn off contour lines
@@ -281,65 +280,36 @@ mpres.cnLevels		     =  levels
 
 mpres.pmTickMarkDisplayMode  = "Always"
 
-#-- init
-itimes=0
-plot = []
 
+ncfile1 = basepath+reso+'/Experiment_'+exp1+'/nao/NAO_eigenvector3.nc'
+ncfile2 = basepath+reso+'/Experiment_'+exp2+'/nao/NAO_eigenvector3.nc'
+print(ncfile1)
+print(ncfile2)
 
-
-for subplot in ['11']:#,'16','11-16']:
+f1   = xr.open_dataset(ncfile1)    		#-- open file
+f2   = xr.open_dataset(ncfile2)    		#-- open file
+data1 = f1[paramname][0,:,:]			#-- read contents of variable 1
+data2 = f2[paramname][0,:,:]			#-- read contents of variable 1
+lat  = f1['lat'][:]				#-- read latitudes
+lon  = f1['lon'][:]				#-- read longitudes
+var=data2-data1
+var,lon = Ngl.add_cyclic(var,lon)	     	#-- add cyclic point to data array and longitude
+mpres.sfXArray              =  lon            	#-- use cyclic longitude; already numpy array
+mpres.sfYArray              =  lat.values	#-- use latitude in numpy array
 	
-	paramname='MSL'
-	ncfile1 = '/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/T159/Experiment_11/nao/NAO_eigenvector3.nc'
-	ncfile2 = '/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/T159/Experiment_16/nao/NAO_eigenvector3.nc'
-
-	f1   = xr.open_dataset(ncfile1)    		#-- open file
-	f2   = xr.open_dataset(ncfile2)    		#-- open file
-	print(ncfile1)
-	print(ncfile2)
-	data1 = f1[paramname][0,:,:]			#-- read contents of variable 1
-	data2 = f2[paramname][0,:,:]			#-- read contents of variable 2
-	lat  = f1['lat'][:]				#-- read latitudes
-	lon  = f1['lon'][:]				#-- read longitudes
-	var=data2-data1
-	var,lon = Ngl.add_cyclic(var,lon)	     	#-- add cyclic point to data array and longitude
-	mpres.sfXArray              =  lon            	#-- use cyclic longitude; already numpy array
-	mpres.sfYArray              =  lat.values	#-- use latitude in numpy array
-	
-	#-- define position of the plots in the frame
-	if(itimes == 0 or itimes == 2):
-	    mpres.vpXF = 0.13
-	else:
-	    mpres.vpXF = 0.52
-	    
-	if(itimes == 0 or itimes == 1):
-	    mpres.vpYF = 0.94
-	else:
-	    mpres.vpYF = 0.5
-	var2 = np.nan_to_num(var)
-	print(var2)
-	plot.append(Ngl.contour_map(wks,var2,mpres))		#-- create contour plot
-	Ngl.draw(plot[itimes])
-	add_lon_labels(wks,plot[itimes],mpres)            #-- add labels to map
+#-- define position of the plots in the frame
+    
+var2 = np.nan_to_num(var)
+print(var2)
 
 
-	itimes=itimes+1
+#-- create and draw the basic map
+plot = Ngl.contour_map(wks,var2,mpres)
+#-- add labels to the plot
+add_labels_lcm(wks,plot,10,10)
 
-#-- add a common labelbar manually
-#lbres                   =  Ngl.Resources()
-#lbres.vpWidthF          =  0.7
-#lbres.vpHeightF         =  0.10
-#lbres.lbOrientation     = 'Horizontal'
-#lbres.lbFillPattern     = 'SolidFill'
-#lbres.lbMonoFillPattern =  21                       #-- must be 21 for color solid fill
-#lbres.lbMonoFillColor   =  False                    #-- use multiple colors
-#lbres.lbFillColors      =  list(colors)             #-- indices from loaded colormap
-#lbres.lbLabelFontHeightF=  0.010
-#lbres.lbLabelAlignment  = 'InteriorEdges'
-#lbres.lbLabelStrings    =  labels
-
-#lbx, lby  = 0.15, 0.1
-#lb = Ngl.labelbar_ndc(wks, len(levels)+1, labels, lbx, lby, lbres)
-
-#-- close the frame
+#-- draw the plot and advance the frame
+Ngl.maximize_plot(wks,plot)
+Ngl.draw(plot)
 Ngl.frame(wks)
+Ngl.end()
