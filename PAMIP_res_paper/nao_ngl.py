@@ -139,8 +139,8 @@ def add_labels_lcm(wks,map,dlat,dlon):
        rotate_val = -90
 
     txres.txAngleF = RAD_TO_DEG * np.arctan(slope_rgt) + rotate_val
-
-    dum_rgt.append(Ngl.add_text(wks,map,lat_label_rgt[n],maxlon,lat_values[n],txres))
+# NO RIGHT LABEL FOR NOW
+    #dum_rgt.append(Ngl.add_text(wks,map,lat_label_rgt[n],maxlon,lat_values[n],txres))
 
 #----------------------------------------------------------------------
 # Now do longitude labels. These are harder because we're not adding
@@ -217,8 +217,9 @@ datapath1=basepath+reso+'/Experiment_'+exp1+'/nao/'
 param=str(sys.argv[4])
 paramname=str(sys.argv[5])
 levels=map(float, sys.argv[10].split(','))
+season=str(sys.argv[11])
 
-name=paramname+'_'+exp1+'_'+reso+'_nao'
+name=paramname+'_'+exp1+'_'+reso+'_'+season+'_nao'
 print(name)
 
 wks = Ngl.open_wks('png',name)   #-- send graphics to PNG file
@@ -278,8 +279,7 @@ mpres.cnLevels		     =  levels
 
 mpres.pmTickMarkDisplayMode  = "Always"
 
-
-ncfile1 = basepath+reso+'/Experiment_'+exp1+'/nao/NAO_eigenvector3.nc'
+ncfile1 = basepath+reso+'/Experiment_'+exp1+'/nao/NAO_eigenvector3_'+season+'.nc'
 print(ncfile1)
 
 f1   = xr.open_dataset(ncfile1)    		#-- open file
