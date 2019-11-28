@@ -1,8 +1,9 @@
 #!/bin/bash
 
 module unload python
+#conda activate pyn_env_py2
 
-input="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/"
+input="/p/largedata/hhb19/jstreffi/runtime/oifsamip/"
 output="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/output/"
 
 
