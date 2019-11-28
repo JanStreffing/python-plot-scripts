@@ -56,33 +56,62 @@ if __name__ == '__main__':
 	print(reslist)
 	itimes=0
 	fig = plt.figure(figsize=(8.27,11.69))
+	ensnumber
 
-	for res in reslist:
-		for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
-			datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
-			datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
-			datapath3=basepath+res+'/Experiment_'+exp1+'/'
-			datapath4=basepath+res+'/Experiment_'+exp2+'/'    
-			dataset3=[]
-			dataset4=[]
-			data3=[]
-			data4=[]
+	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
+		for res in reslist:
+			if res == 'T1279':
+				ensnumber = 40
+			else:
+				ensnumber = 100
+			if paramname == 'synact':
+				datapath1=basepath+res+'/Experiment_'+exp1+'/synact/'
+                                datapath2=basepath+res+'/Experiment_'+exp2+'/synact/'
+				dataset3=[]
+				dataset4=[]
+				data3=[]
+				data4=[]
 
-			# Reading netcdf files
-			ncfile1 = datapath1+paramname+'_ensmean_'+season+'.nc'
-			ncfile2 = datapath2+paramname+'_ensmean_'+season+'.nc'
-			dataset1 = Dataset(ncfile1) 
-			dataset2 = Dataset(ncfile2) 
-			print ncfile1
-			print ncfile2
+				# Reading netcdf files
+				ncfile1 = datapath1+'3D_timstd_'+season+'.nc'
+				ncfile2 = datapath2+'3D_timstd_'+season+'.nc'
+				dataset1 = Dataset(ncfile1)
+				dataset2 = Dataset(ncfile2)
+				print ncfile1
+				print ncfile2
 
-			if str(sys.argv[9]) == "true":
-				for i in range(100):
-				     ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-				     ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-				     print ncfile3
-				     dataset3.append(Dataset(ncfile3))
-				     dataset4.append(Dataset(ncfile4))
+				if str(sys.argv[9]) == "true":
+					for i in range(ensnumber):
+					     ncfile3 = datapath1+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
+					     ncfile4 = datapath2+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
+					     print ncfile3
+					     dataset3.append(Dataset(ncfile3))
+					     dataset4.append(Dataset(ncfile4))
+			else:
+				datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
+				datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
+				datapath3=basepath+res+'/Experiment_'+exp1+'/'
+				datapath4=basepath+res+'/Experiment_'+exp2+'/'    
+				dataset3=[]
+				dataset4=[]
+				data3=[]
+				data4=[]
+
+				# Reading netcdf files
+				ncfile1 = datapath1+paramname+'_ensmean_'+season+'.nc'
+				ncfile2 = datapath2+paramname+'_ensmean_'+season+'.nc'
+				dataset1 = Dataset(ncfile1) 
+				dataset2 = Dataset(ncfile2) 
+				print ncfile1
+				print ncfile2
+
+				if str(sys.argv[9]) == "true":
+					for i in range(ensnumber):
+					     ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+					     ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+					     print ncfile3
+					     dataset3.append(Dataset(ncfile3))
+					     dataset4.append(Dataset(ncfile4))
 
 
 			# Loading data from datasets
@@ -144,28 +173,29 @@ if __name__ == '__main__':
 			gl.xlocator = mticker.FixedLocator([-180,-135,-90,-45,0,45,90,135,180])
 			gl.ylocator = mticker.FixedLocator([80, 60, 30, 0])
 
-
-
-			plt.tight_layout(pad=2)
-
 			cmap_TR.set_over("darkred")
 			cmap_TR.set_under("deeppink")
 
+			# Plotting
 			if str(sys.argv[9]) == "true":
 			  im=plt.contourf(lons, lats, data4, hatches=[' ','...'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
 			im=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			
+			# Adding text labels
+			if ( itimes == 0 and res == 'T159' ):
+				plt.text(0.00, 1.03, 'TL159', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
+			if ( itimes == 1 and res == 'T511' ):
+				plt.text(0.00, 1.03, 'TL511', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
+			if ( itimes == 2 and res == 'T1279' ):
+				plt.text(0.00, 1.03, 'TL1279', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
+                        if ( itimes % 2 == 0 ):
+                                plt.text(-0.30, .50, season, horizontalalignment='left', fontsize=18, transform=ax.transAxes)
 
-			if ( itimes == 0 ):
-			  plt.text(0.00, 1.03, 'TL159', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
-			elif ( itimes == 1):
-			  plt.text(0.00, 1.03, 'TL511', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
-			#elif ( itimes == 2):
-			#  plt.text(0.00, 1.03, 'TL1279', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
 
-
+			# Increment plot counter
 			itimes=itimes+1
     
-fig.subplots_adjust(left=0.01, right=0.85, bottom=0.1, top=0.98, wspace = -0.2, hspace=0.15)
+fig.subplots_adjust(left=0.01, right=0.85, bottom=0.1, top=0.98, wspace = -0.3, hspace=0.15)
 cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
