@@ -56,7 +56,6 @@ if __name__ == '__main__':
 	print(reslist)
 	itimes=0
 	fig = plt.figure(figsize=(8.27,11.69))
-	ensnumber
 
 	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
 		for res in reslist:
@@ -107,34 +106,34 @@ if __name__ == '__main__':
 
 				if str(sys.argv[9]) == "true":
 					for i in range(ensnumber):
-					     ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-					     ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-					     print ncfile3
-					     dataset3.append(Dataset(ncfile3))
-					     dataset4.append(Dataset(ncfile4))
-
-
+						ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+						ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+						print ncfile3
+						print ncfile4
+						dataset3.append(Dataset(ncfile3))
+						dataset4.append(Dataset(ncfile4))
+						
 			# Loading data from datasets
 			data1 = dataset1.variables[param][:]
 			data2 = dataset2.variables[param][:]
 			if str(sys.argv[9]) == "true":
-				for i in range(100):
+				for i in range(ensnumber):
 					data3.append(dataset3[i].variables[param][:])
 					data4.append(dataset4[i].variables[param][:])
 
+			print(np.isnan(data3).any())
+			print(np.isnan(data4).any())
+			print(np.squeeze(data1).shape)
+			print(len(np.squeeze(data1).shape))
 
 			# Calculating Welch T-test
 			welch = stats.ttest_ind(data3,data4)
-			print(np.isnan(data3).any())
-			print(np.isnan(data4).any())
 
 			# in case data has multiple levels, select only the 6th one (50000 hPa)
-			print(np.squeeze(data1).shape)
-			print(len(np.squeeze(data1).shape))
 			if (len(np.squeeze(data1).shape)) == 3:
 				data1 = data1[0,5,:,:]
 				data2 = data2[0,5,:,:]
-				for i in range(100):
+				for i in range(ensnumber):
 					data3[i] =  data3[i][0,5,:,:]
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
@@ -182,24 +181,23 @@ if __name__ == '__main__':
 			im=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
 			
 			# Adding text labels
-			if ( itimes == 0 and res == 'T159' ):
-				plt.text(0.00, 1.03, 'TL159', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
-			if ( itimes == 1 and res == 'T511' ):
-				plt.text(0.00, 1.03, 'TL511', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
-			if ( itimes == 2 and res == 'T1279' ):
-				plt.text(0.00, 1.03, 'TL1279', horizontalalignment='left', fontsize=18, transform=ax.transAxes)
-                        if ( itimes % 2 == 0 ):
-                                plt.text(-0.30, .50, season, horizontalalignment='left', fontsize=18, transform=ax.transAxes)
+                        if ( itimes == 0 and res == 'T159' ):
+                                plt.text(0.50, 1.05, 'TL159', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+                        if ( itimes == 1 and res == 'T511' ):
+                                plt.text(0.50, 1.05, 'TL511', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+                        if ( itimes == 2 and res == 'T1279' ):
+                                plt.text(0.50, 1.05, 'TL1279', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+                        if ( itimes % 3 == 0 ):
+                                plt.text(-0.05, .50, season, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
 
+                        # Increment plot counter
+                        itimes=itimes+1
 
-			# Increment plot counter
-			itimes=itimes+1
-    
-fig.subplots_adjust(left=0.01, right=0.85, bottom=0.1, top=0.98, wspace = -0.3, hspace=0.15)
+fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.85, top = 0.95, bottom = 0.05)
 cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_map_diff.png')
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_map_diff.png', dpi=300)
 
 
 
