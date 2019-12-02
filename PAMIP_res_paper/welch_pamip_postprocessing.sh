@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M #haus SD T2M z500 MSL U synact NAO
+for todo in MSL SD T2M z500 MSL U synact # NAO haus
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then

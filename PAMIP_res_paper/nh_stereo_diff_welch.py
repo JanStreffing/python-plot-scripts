@@ -55,7 +55,8 @@ if __name__ == '__main__':
 	reslist=map(str, sys.argv[3].split(','))
 	print(reslist)
 	itimes=0
-	fig = plt.figure(figsize=(8.27,11.69))
+	fig =  plt.figure(figsize=(9,10.6875))
+	#fig = plt.figure(figsize=(12,14.25))
 
 	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
 		for res in reslist:
@@ -161,6 +162,7 @@ if __name__ == '__main__':
 				data4 = data_cat3 < 0.05
 				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
 				data4[abs(data_cat2-data_cat1) < mapticks[(int(sys.argv[12])/2)-2]] = False
+				print( mapticks[(int(len(mapticks))/2)])
 
 			# Set position of subplot and some general settings for cartopy
 			ax=plt.subplot(4,len(reslist),itimes+1,projection=ccrs.NorthPolarStereo())
@@ -177,7 +179,7 @@ if __name__ == '__main__':
 
 			# Plotting
 			if str(sys.argv[9]) == "true":
-			  im=plt.contourf(lons, lats, data4, hatches=[' ','...'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
+			  im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
 			im=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
 			
 			# Adding text labels
@@ -194,10 +196,10 @@ if __name__ == '__main__':
                         itimes=itimes+1
 
 fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.85, top = 0.95, bottom = 0.05)
-cbar_ax = fig.add_axes([0.88, 0.06, 0.03, 0.87])
+cbar_ax = fig.add_axes([0.88, 0.16, 0.03, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_map_diff.png', dpi=300)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=300)
 
 
 
