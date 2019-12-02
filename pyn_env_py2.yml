@@ -11,10 +11,10 @@ dependencies:
   - basemap=1.2.0=py27hd759880_4
   - boost-cpp=1.68.0=h11c811c_1000
   - bzip2=1.0.8=h516909a_1
-  - ca-certificates=2019.9.11=hecc5488_0
+  - ca-certificates=2019.11.28=hecc5488_0
   - cairo=1.16.0=ha4e643d_1000
   - cartopy=0.17.0=py27hd759880_1006
-  - certifi=2019.9.11=py27_0
+  - certifi=2019.11.28=py27_0
   - cffi=1.13.1=py27h8022711_0
   - cfitsio=3.470=hb60a0a2_2
   - cftime=1.0.4.2=py27hc1659b7_0
@@ -32,6 +32,8 @@ dependencies:
   - functools32=3.2.3.2=py_3
   - futures=3.3.0=py27_0
   - g2clib=1.6.0=hf3f1b0b_9
+  - geographiclib=1.50=py_0
+  - geopy=1.20.0=py_0
   - geos=3.7.2=he1b5a44_2
   - geotiff=1.4.3=hb6868eb_1001
   - gettext=0.19.8.1=hc5be6a0_1002
@@ -88,7 +90,7 @@ dependencies:
   - numpy=1.16.4=py27h95a1406_0
   - olefile=0.46=py_0
   - openjpeg=2.3.1=h21c5421_1
-  - openssl=1.1.1c=h516909a_0
+  - openssl=1.1.1d=h516909a_0
   - owslib=0.18.0=py_0
   - pandas=0.24.2=py27hb3f55d8_0
   - pcre=8.43=he1b5a44_0
