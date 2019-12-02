@@ -22,7 +22,7 @@ output="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/output/"
 #   Fontsize of colorbar ticks
 
 
-for todo in haus # haus SD T2M z500 MSL U synact NAO
+for todo in MSL SD T2M z500 MSL U synact # NAO haus
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -64,7 +64,7 @@ do
 	if [[ "$todo" == "NAO" ]]; then
 		for season in DJF MAM JJA SON
 		do
-			for res in T511 T159; do
+			for res in T511 T159 T1279; do
 				python nao_ngl_diff.py 11 16 $res MSL MSL $in_mistral 1 $out_mistral false -0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8 $season
 				python nao_ngl.py 11 1 $res MSL MSL $in_mistral 1 $out_mistral false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
 				python nao_ngl.py 16 1 $res MSL MSL $in_mistral 1 $out_mistral false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season

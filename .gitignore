@@ -2,3 +2,4 @@
 *.gedit-save*
 *.swp
 *.png
+*.pyc

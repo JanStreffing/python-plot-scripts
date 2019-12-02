@@ -76,8 +76,8 @@ if __name__ == '__main__':
 			datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
 
 			# Reading netcdf files
-			ncfile1 = datapath1+paramname+'_ensmean_'+season+'.nc'
-			ncfile2 = datapath2+paramname+'_ensmean_'+season+'.nc'
+			ncfile1 = datapath1+paramname+'_ensmean_nh_'+season+'.nc'
+			ncfile2 = datapath2+paramname+'_ensmean_nh_'+season+'.nc'
 			dataset1 = Dataset(ncfile1) 
 			dataset2 = Dataset(ncfile2) 
 			print ncfile1
@@ -91,8 +91,15 @@ if __name__ == '__main__':
 			print(np.squeeze(data1).shape)
 			print(len(np.squeeze(data1).shape))
 			if (len(np.squeeze(data1).shape)) == 3:
-				data1 = data1[0,8,:,:]
-				data2 = data2[0,8,:,:]
+				if res == 'T1279':
+					print('reading layer 8')
+					data1 = data1[0,7,:,:]
+					data2 = data2[0,7,:,:]
+				else:
+					print('reading layer 10')
+					data1 = data1[0,9,:,:]
+					data2 = data2[0,9,:,:]
+		
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
@@ -125,7 +132,7 @@ if __name__ == '__main__':
 
 			# Set position of subplot and some general settings for cartopy
 			ax=plt.subplot(4,len(reslist),itimes+1,projection=ccrs.NorthPolarStereo())
-			ax.set_extent([-180, 180, 29, 29], ccrs.PlateCarree())
+			ax.set_extent([-180, 180, 15, 15], ccrs.PlateCarree())
 			ax.add_feature(cfeature.COASTLINE)
 
 			# Configuring cartopy gridlines
@@ -147,12 +154,15 @@ if __name__ == '__main__':
                         if ( itimes % 3 == 0 ):
                                 plt.text(-0.05, .50, season, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
 
-			t = plt.text(0.04, 0.05, 'HD='+str(round(haus*111.3,2))+'km', horizontalalignment='left', fontsize=9, transform=ax.transAxes)
+			if res == 'T1279':
+				t = plt.text(0.04, 0.05, 'HD='+str(round(haus*41.7,2))+'km', horizontalalignment='left', fontsize=9, transform=ax.transAxes)
+			else:
+				t = plt.text(0.04, 0.05, 'HD='+str(round(haus*111.3,2))+'km', horizontalalignment='left', fontsize=9, transform=ax.transAxes)
 			t.set_bbox(dict(facecolor='lightgrey', alpha=0.5, edgecolor='grey'))
 			# Increment plot counter
 			itimes=itimes+1
     
-fig.subplots_adjust(left=0.1, right=0.85, bottom=0.05, top=0.95, wspace = 0.1, hspace=-0.1)
+fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.9, top = 0.95, bottom = 0.05)
 fig.savefig(outpath+'jetstream_hausdorf.png')
 
 
