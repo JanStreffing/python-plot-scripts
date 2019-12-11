@@ -21,16 +21,23 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in T U
+for todo in UProfile #T U
 do
 
-	# t2m hPa polar plots 
+	# t2m hPa zonal plots 
 	if [[ "$todo" == "T" ]]; then
-		python zonal.py 11 16 T159,T511,T1279 T T $in_mistral 1 $out_mistral true -2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2 colorbar_TR 14
+		python zonal.py 11 16 T159,T511,T1279 T T $in_mistral 1 $out_mistral true  -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 14
+		#-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2
 	fi
 
-	# U polar plots
+	# U zonal plots
 	if [[ "$todo" == "U" ]]; then
-		python zonal.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral true -1,-0.75,-0.5,-0.25,-0.1,0.1,0.25,0.5,0.75,1 colorbar_TR 14
+		python zonal.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 14
+		#-1,-0.75,-0.5,-0.25,-0.1,0.1,0.25,0.5,0.75,1 
 	fi
+	
+        if [[ "$todo" == "UProfile" ]]; then
+                python profile.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral 14
+        fi
+
 done

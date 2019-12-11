@@ -87,6 +87,9 @@ if __name__ == '__main__':
 						x2[t]=np.mean(data2[t,k,i,:])
 					res1[k,i]=np.mean(x2)-np.mean(x1)
 					resc[k,i]=np.mean(x1)
+					if param == 'T':
+						resc[k,i]= resc[k,i]-273.15
+					
 
 
 			ax=plt.subplot(4,len(reslist),itimes+1)
@@ -110,7 +113,7 @@ if __name__ == '__main__':
 			plt.xlim([20,89])
    
 			levels=np.arange(-80, 60, 4)
-			cs=plt.contour(lats, levs/100, resc-273.15, colors='k', levels=levels)
+			cs=plt.contour(lats, levs/100, resc, colors='k', levels=levels)
 			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
 
 		
@@ -126,12 +129,12 @@ if __name__ == '__main__':
 
                         itimes=itimes+1
 
-fig.subplots_adjust(hspace=0.14, wspace = 0.1, left = 0.2, right = 0.85, top = 0.95, bottom = 0.1)
-cbar_ax = fig.add_axes([0.88, 0.16, 0.03, 0.67])
-cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
+fig.subplots_adjust(hspace=0.14, wspace = 0.1, left = 0.15, right = 0.88, top = 0.95, bottom = 0.1)
+cbar_ax = fig.add_axes([0.9, 0.16, 0.02, 0.67])
+cbar_ax.tick_params(labelsize=18) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
 degree_sign= u'\N{degree sign}'
-fig.text(0.06, 0.5, 'Pressure [hPa]', fontsize=20, va='center', rotation='vertical')
+fig.text(0.02, 0.5, 'Pressure [hPa]', fontsize=20, va='center', rotation='vertical')
 fig.text(0.5, 0.04, 'Latitude ['+degree_sign+'N]', fontsize=20, ha='center')
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=150)
 
