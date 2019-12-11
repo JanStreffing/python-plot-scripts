@@ -3,26 +3,26 @@
 module unload python
 #conda activate pyn_env_py2
 
-input="/p/largedata/hhb19/jstreffi/runtime/oifsamip/"
-output="/p/largedata/hhb19/jstreffi/runtime/oifsamip/T1279/output/"
+in_mistral="/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/"
+out_mistral="/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/"
 
 
 # Argument list:
 #   Experiment id 1
 #   Experiment id 2
-#   Resolution
+#   Resolutions
 #   Variable name in netcdf files
 #   Variable name in name of netcdf file
 #   Input path of ensemble mean data
 #   Factor by which data should be divided
 #   Output path for plots / input path for ensstd data
-#   Bool for using ensstd or not
+#   Bool for using welchs-t test or not
 #   List of tick on colorbar
 #   Name of custom colorbar
 #   Fontsize of colorbar ticks
 
 
-for todo in MSL SD T2M z500 MSL U synact # NAO haus
+for todo in NAO #PRECIP #T2M # MSL SD T2M z500 MSL U synact # NAO haus
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -61,11 +61,16 @@ do
 		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 SD SD $in_mistral 0.01 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18 
 	fi
 
+	if [[ "$todo" == "PRECIP" ]]; then
+		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 PRECIP PRECIP $in_mistral 0.00025 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18 
+	fi
+
 	if [[ "$todo" == "NAO" ]]; then
 		for season in DJF MAM JJA SON
 		do
 			for res in T511 T159 T1279; do
-				python nao_ngl_diff.py 11 16 $res MSL MSL $in_mistral 1 $out_mistral false -0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8 $season
+				python nao_ngl_diff.py 11 16 $res MSL MSL $in_mistral 1 $out_mistral false -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 $season
+				#-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8
 				python nao_ngl.py 11 1 $res MSL MSL $in_mistral 1 $out_mistral false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
 				python nao_ngl.py 16 1 $res MSL MSL $in_mistral 1 $out_mistral false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
 			done
