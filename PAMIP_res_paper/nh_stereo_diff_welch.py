@@ -47,7 +47,7 @@ if __name__ == '__main__':
 	basepath=str(sys.argv[6])
 	outpath=str(sys.argv[8])
 
-
+	print(str(sys.argv))
 	if str(sys.argv[11]) == "colorbar_TR_15":
 		from colorbar_TR_15 import cmap_TR
 	if str(sys.argv[11]) == "colorbar_TR_70":
@@ -126,20 +126,27 @@ if __name__ == '__main__':
 					data3.append(dataset3[i].variables[param][:])
 					data4.append(dataset4[i].variables[param][:])
 
-			print(np.isnan(data3).any())
-			print(np.isnan(data4).any())
 			print(np.squeeze(data1).shape)
 			print(len(np.squeeze(data1).shape))
 
+			# in case data has multiple levels, select only the (50000 hPa) 
+			if (len(np.squeeze(data1).shape)) == 3:
+				if [ res == 'T1279' ]:
+					data1 = data1[0,4,:,:]
+					data2 = data2[0,4,:,:]
+				else:
+					data1 = data1[0,5,:,:]
+					data2 = data2[0,5,:,:]
+				for i in range(ensnumber):
+					if [ res == 'T1279' ]:
+						data3[i] =  data3[i][0,4,:,:]
+						data4[i] =  data4[i][0,4,:,:]
+					else:
+						data3[i] =  data3[i][0,5,:,:]
+						data4[i] =  data4[i][0,5,:,:]
+			print(np.isnan(data3))
 			# Calculating Welch T-test
 			welch = stats.ttest_ind(data3,data4)
-
-			# in case data has multiple levels, select only the 6th one (50000 hPa)
-			if (len(np.squeeze(data1).shape)) == 3:
-				data1 = data1[0,5,:,:]
-				data2 = data2[0,5,:,:]
-				for i in range(ensnumber):
-					data3[i] =  data3[i][0,5,:,:]
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
