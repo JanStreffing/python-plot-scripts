@@ -93,12 +93,12 @@ if __name__ == '__main__':
 			if (len(np.squeeze(data1).shape)) == 3:
 				if res == 'T1279':
 					print('reading layer 8')
-					data1 = data1[0,7,:,:]
-					data2 = data2[0,7,:,:]
+					data1 = data1[0,2,:,:]
+					data2 = data2[0,2,:,:]
 				else:
 					print('reading layer 10')
-					data1 = data1[0,9,:,:]
-					data2 = data2[0,9,:,:]
+					data1 = data1[0,2,:,:]
+					data2 = data2[0,2,:,:]
 		
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
@@ -116,10 +116,10 @@ if __name__ == '__main__':
 			data_cat2 = Ngl.add_cyclic(data_cat2)
 
 			# Binarize input fields (normal method with np.where did not work, not 100% sure why. This convoluted way does. Maybe something to do with masked arrays?)
-			upper1 = np.where(abs(data_cat1) > 25)
-			upper2 = np.where(abs(data_cat2) > 25)
-                        lower1 = np.where(abs(data_cat1) < 25)
-                        lower2 = np.where(abs(data_cat2) < 25)
+			upper1 = np.where(abs(data_cat1) > 5)
+			upper2 = np.where(abs(data_cat2) > 5)
+                        lower1 = np.where(abs(data_cat1) < 5)
+                        lower2 = np.where(abs(data_cat2) < 5)
 			data_cat1[upper1] = 1
                         data_cat2[upper2] = 1
                         data_cat1[lower1] = 0
