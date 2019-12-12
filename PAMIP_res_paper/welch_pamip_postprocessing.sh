@@ -22,7 +22,7 @@ out_mistral="/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in NAO #PRECIP #T2M # MSL SD T2M z500 MSL U synact # NAO haus
+for todo in forcing #PRECIP #T2M # MSL SD T2M z500 MSL U synact # NAO haus
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -80,5 +80,10 @@ do
 	if [[ "$todo" == "haus" ]]; then
 		python hausdorf.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral false -1,0,1 colorbar_TR_15 3
 	fi
+
+        if [[ "$todo" == "forcing" ]]; then
+                python nh_stereo_forcing.py 11 16 dummy sic sic $in_mistral 1 $out_mistral false -.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0.01,-0 colorbar_red 18 0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1
+        fi
+
 
 done
