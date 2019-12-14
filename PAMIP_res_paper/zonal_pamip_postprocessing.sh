@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in UProfile #T U iso_diff
+for todo in iso_diff #T U UP iso_diff
 do
 
 	# t2m hPa zonal plots 
@@ -36,7 +36,7 @@ do
 		#-1,-0.75,-0.5,-0.25,-0.1,0.1,0.25,0.5,0.75,1 
 	fi
 	
-        if [[ "$todo" == "UProfile" ]]; then
+        if [[ "$todo" == "UP" ]]; then
                 python profile.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral 14
         fi
 
