@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in UProfile #T U
+for todo in UProfile #T U iso_diff
 do
 
 	# t2m hPa zonal plots 
@@ -40,4 +40,8 @@ do
                 python profile.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral 14
         fi
 
+        if [[ "$todo" == "iso_diff" ]]; then
+                python isohypse_diff.py
+		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/isohypse_diff.png $out_mistral
+	fi
 done
