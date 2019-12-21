@@ -52,9 +52,19 @@ if __name__ == '__main__':
 		from colorbar_TR_15 import cmap_TR
 	if str(sys.argv[11]) == "colorbar_TR_70":
 		from colorbar_TR_70 import cmap_TR
-
+		
 	param=str(sys.argv[4])
 	paramname=str(sys.argv[5])
+	if param == 'PRECIP':
+		debug = 1.0000001
+		area= 5
+	if param == 'SD':
+                debug = 1
+                area = 40
+	else:
+		debug = 1
+		area = 29
+
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	print(reslist)
@@ -62,7 +72,7 @@ if __name__ == '__main__':
 	fig =  plt.figure(figsize=(9,10.6875))
 	#fig = plt.figure(figsize=(12,14.25))
 
-	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
+	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
 			if res == 'T1279':
 				ensnumber = 40
@@ -144,7 +154,9 @@ if __name__ == '__main__':
 					else:
 						data3[i] =  data3[i][0,5,:,:]
 						data4[i] =  data4[i][0,5,:,:]
-			print(np.isnan(data3))
+			print(np.isnan(data3).any())
+			print(np.isnan(data1).any())
+			print(np.isnan(data2).any())
 			# Calculating Welch T-test
 			welch = stats.ttest_ind(data3,data4)
 
@@ -162,8 +174,12 @@ if __name__ == '__main__':
 			lats = dataset1.variables[u'lat'][:]
 
 			# add cyclic point to data array and longitude
+			print(data_cat1.shape)
+			print(data_cat2.shape)
 			data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
 			data_cat2 = Ngl.add_cyclic(data_cat2)	
+			print(data_cat1.shape)
+			print(data_cat2.shape)
 			if str(sys.argv[9]) == "true":
 				data_cat3 = Ngl.add_cyclic(data_cat3)	
 
@@ -177,7 +193,7 @@ if __name__ == '__main__':
 
 			# Set position of subplot and some general settings for cartopy
 			ax=plt.subplot(4,len(reslist),itimes+1,projection=ccrs.NorthPolarStereo())
-			ax.set_extent([-180, 180, 29, 29], ccrs.PlateCarree())
+			ax.set_extent([-180, 180, area, area], ccrs.PlateCarree())
 			ax.add_feature(cfeature.COASTLINE)
 
 			# Configuring cartopy gridlines
@@ -187,11 +203,12 @@ if __name__ == '__main__':
 
 			cmap_TR.set_over("darkred")
 			cmap_TR.set_under("deeppink")
-
+			print(np.amax(data_cat2-data_cat1))
+			print(np.amin(data_cat2-data_cat1))
 			# Plotting
 			if str(sys.argv[9]) == "true":
 			  im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
-			im=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			im=plt.contourf(lons, lats, data_cat2-data_cat1*debug, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
 			
 			# Adding text labels
                         if ( itimes == 0 and res == 'T159' ):

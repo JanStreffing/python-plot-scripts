@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in iso_diff #T U UP iso_diff
+for todo in T #sin_diff T U UP #iso_diff
 do
 
 	# t2m hPa zonal plots 
@@ -43,5 +43,10 @@ do
         if [[ "$todo" == "iso_diff" ]]; then
                 python isohypse_diff.py
 		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/isohypse_diff.png $out_mistral
+	fi
+
+        if [[ "$todo" == "sin_diff" ]]; then
+                python sinuosity_diff.py
+		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/sinuosity_diff.png $out_mistral
 	fi
 done

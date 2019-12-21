@@ -58,7 +58,7 @@ if __name__ == '__main__':
 	itimes=0
 	fig =  plt.figure(figsize=(9,9)) #10.6875))
 
-	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
+	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		datapath1=basepath+'T159/Experiment_'+exp1+'/E001/post_20000401/'
 		datapath2=basepath+'T159/Experiment_'+exp2+'/E001/post_20000401/'
 

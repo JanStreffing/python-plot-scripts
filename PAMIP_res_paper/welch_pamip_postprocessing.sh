@@ -22,7 +22,7 @@ out_mistral="/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in forcing #PRECIP #T2M # MSL SD T2M z500 MSL U synact # NAO haus
+for todo in SD #T2M MSL z500 U synact haus SD #forcing
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -58,11 +58,11 @@ do
 	fi
 
 	if [[ "$todo" == "SD" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 SD SD $in_mistral 0.01 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18 
+		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 SD SD $in_mistral 0.01 $out_mistral true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18 
 	fi
 
 	if [[ "$todo" == "PRECIP" ]]; then
-		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 PRECIP PRECIP $in_mistral 0.00025 $out_mistral true -3,-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2,3 colorbar_TR_15 18 
+		python nh_stereo_diff_welch.py 11 16 T159,T511,T1279 PRECIP PRECIP $in_mistral 0.00025 $out_mistral true -1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1 colorbar_TR_15 18 
 	fi
 
 	if [[ "$todo" == "NAO" ]]; then

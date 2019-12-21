@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	itimes=0
 	fig = plt.figure(figsize=(12,10))
 
-	for season in [ 'DJF', 'MAM', 'JJA', 'SON' ]:
+	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
 			datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
 			datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
