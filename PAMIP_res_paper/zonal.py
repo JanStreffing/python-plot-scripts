@@ -30,6 +30,7 @@ from matplotlib.pylab import *
 from netCDF4 import Dataset
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+np.set_printoptions(threshold=sys.maxsize)
 
 if __name__ == '__main__':
 	exp1=str(sys.argv[1])
@@ -52,11 +53,25 @@ if __name__ == '__main__':
 	itimes=0
 	fig = plt.figure(figsize=(12,10))
 
+	if str(sys.argv[9]) == "true":
+		print("hashing signifcant changes")
+
+
 	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
+			if res == 'T1279':
+				ensnumber = 60
+			else:
+				ensnumber = 100
+
 			datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
 			datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
-
+			datapath3=basepath+res+'/Experiment_'+exp1+'/'
+			datapath4=basepath+res+'/Experiment_'+exp2+'/'
+			res3a=[]
+			res4a=[]
+			data3=[]
+			data4=[]
 
 			# Reading netcdf files
 			ncfile1 = datapath1+paramname+'_ensmean_'+season+'.nc'
@@ -75,10 +90,10 @@ if __name__ == '__main__':
 
 			res1=np.zeros([data1.shape[1],data1.shape[2]])
 			res2=np.copy(res1)
-			res3=np.copy(res1)
 			resc=np.copy(res1)
 			x1=np.zeros(data1.shape[0])
 			x2=np.copy(x1)
+
 
 			for k in range(data1.shape[1]):
 				for i in range(data1.shape[2]):
@@ -89,8 +104,49 @@ if __name__ == '__main__':
 					resc[k,i]=np.mean(x1)
 					if param == 'T':
 						resc[k,i]= resc[k,i]-273.15
-					
 
+			res_old = [0]					
+			if str(sys.argv[9]) == "true":
+				for ens in range(ensnumber):
+					ncfile3 = datapath3+'E'+str(ens+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+					ncfile4 = datapath4+'E'+str(ens+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
+
+
+					f = netcdf.netcdf_file(ncfile3, 'r')
+					data3 = np.copy(f.variables[param].data)
+					f.close()
+					print(ncfile3)
+
+					f = netcdf.netcdf_file(ncfile4, 'r')
+					data4= np.copy(f.variables[param].data)
+					f.close()
+
+					res3=np.zeros([data1.shape[1],data1.shape[2]])
+					res4=np.copy(res3)
+					x3=np.zeros(data1.shape[0])
+					x4=np.copy(x3)
+
+					for k in range(data1.shape[1]):
+						for i in range(data1.shape[2]):
+							for t in range(data1.shape[0]):
+								x3[t]=np.mean(data3[t,k,i,:])
+								x4[t]=np.mean(data4[t,k,i,:])
+                                        		res3[k,i]=np.mean(x3)
+                                        		res4[k,i]=np.mean(x4)
+                                        		if param == 'T':
+                                                		res3[k,i]= res3[k,i]-273.15
+                                                		res4[k,i]= res4[k,i]-273.15
+					res3a.append(res3)
+					res4a.append(res4)
+			
+
+			welch = stats.ttest_ind(res3a,res4a)
+			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
+			if str(sys.argv[9]) == "true":
+				data_sig = welch[1] < 0.1
+				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
+				data_sig[abs(res1) < mapticks[(int(len(mapticks))/2)]] = False
+				print( mapticks[(int(len(mapticks))/2)])
 
 			ax=plt.subplot(4,len(reslist),itimes+1)
 
@@ -115,6 +171,9 @@ if __name__ == '__main__':
 			levels=np.arange(-80, 60, 4)
 			cs=plt.contour(lats, levs/100, resc, colors='k', levels=levels)
 			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
+
+			if str(sys.argv[9]) == "true":
+				wl=plt.contourf(lats, levs/100, data_sig, hatches=[' ','//'],cmap=cmap_TR, color='grey', extend='both', zorder=2, alpha=0)
 
 		
                         # Increment plot counterdding text labels

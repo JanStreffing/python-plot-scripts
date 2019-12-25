@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in T #sin_diff T U UP #iso_diff
+for todo in U T #sin_diff T U UP #iso_diff
 do
 
 	# t2m hPa zonal plots 
