@@ -75,7 +75,7 @@ if __name__ == '__main__':
 	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
 			if res == 'T1279':
-				ensnumber = 40
+				ensnumber = 60
 			else:
 				ensnumber = 100
 			if paramname == 'synact':
@@ -136,8 +136,6 @@ if __name__ == '__main__':
 					data3.append(dataset3[i].variables[param][:])
 					data4.append(dataset4[i].variables[param][:])
 
-			print(np.squeeze(data1).shape)
-			print(len(np.squeeze(data1).shape))
 
 			# in case data has multiple levels, select only the (50000 hPa) 
 			if (len(np.squeeze(data1).shape)) == 3:
@@ -154,10 +152,11 @@ if __name__ == '__main__':
 					else:
 						data3[i] =  data3[i][0,5,:,:]
 						data4[i] =  data4[i][0,5,:,:]
-			print(np.isnan(data3).any())
-			print(np.isnan(data1).any())
-			print(np.isnan(data2).any())
 			# Calculating Welch T-test
+			print(np.squeeze(data3).shape)
+			print(len(np.squeeze(data3).shape))
+			print(type(data3))
+			print(type(data3[0]))
 			welch = stats.ttest_ind(data3,data4)
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
@@ -186,9 +185,9 @@ if __name__ == '__main__':
 
 			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
 			if str(sys.argv[9]) == "true":
-				data4 = data_cat3 < 0.05
+				data4 = data_cat3 < 0.1
 				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
-				data4[abs(data_cat2-data_cat1) < mapticks[(int(sys.argv[12])/2)-2]] = False
+				data4[abs(data_cat2-data_cat1) < mapticks[(int(len(mapticks))/2)]] = False
 				print( mapticks[(int(len(mapticks))/2)])
 
 			# Set position of subplot and some general settings for cartopy
