@@ -163,27 +163,27 @@ if __name__ == '__main__':
 			tstar = np.array([])
 			pvalue = arange(s1*s2).reshape(s1,s2)
 
-			for bi in tqdm(range(B)):
+			for bi in tqdm(range(0,B)):
 				xstar = np.array([])
 				ystar = np.array([])
-				for ni in range(n):
+				for ni in range(0,n):
 					r = rd.randrange(0, ensnumber*2)
 					xstar = np.vstack((xstar, xyobs[r])) if xstar.size else xyobs[r]
-				for mi in range(m):
+				for mi in range(0,m):
 					r = rd.randrange(0, ensnumber*2)
 					ystar = np.vstack((ystar, xyobs[r])) if ystar.size else xyobs[r]
 				xbarstar = np.mean(xstar,axis=0)
 				ybarstar = np.mean(ystar,axis=0)
 				tstar = np.dstack((tstar, xbarstar - ybarstar)) if tstar.size else xbarstar - ybarstar
 			tstar = np.swapaxes(tstar,0,2)
-			#tstar = np.swapaxes(tstar,1,2)
+			tstar = np.swapaxes(tstar,1,2)
 			print(tstar.shape)
 			
 			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
 			for lat in tqdm(range(0,tstarobs.shape[1])):
 				for lon in range(0,tstarobs.shape[2]):
 					#p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
-					p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+					p = tstar[:,lat,lon][tstar[:,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
 					pvalue[lat,lon] = p
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
