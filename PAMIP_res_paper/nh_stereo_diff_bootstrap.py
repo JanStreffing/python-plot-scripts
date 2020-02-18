@@ -17,10 +17,11 @@ Input arguments:
 	9	Name of colormap module
 	10	List of colorbar points
 """
-
+from __future__ import division
 import sys
 import random as rd
 import numpy as np
+import pandas as pd
 import bootstrapped.bootstrap as bs
 import bootstrapped.stats_functions as bs_stats
 from scipy import signal
@@ -33,6 +34,7 @@ from netCDF4 import Dataset
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import Ngl
+from tqdm import tqdm
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -152,19 +154,15 @@ if __name__ == '__main__':
 						data4[i] =  data4[i][0,5,:,:]
 
 			# Calculating Bootstrap test
-			print(np.squeeze(data3).shape)
-			print(len(np.squeeze(data3).shape))
-			print(type(data3))
-			print(type(data3[0]))
-
 			xyobs = np.asarray(np.concatenate([data3,data4]))
 			tstarobs = np.asarray(data2 - data1)
 			tstar = []
-			n = 100
-			m = 100
+			pvalue = []
+			n = 5000
+			m = 5000
 			B = n+m
-			
-			for bi in range(B):
+
+			for bi in tqdm(range(B)):
 				xstar = []
 				ystar = []
 				for ni in range(n):
@@ -176,20 +174,14 @@ if __name__ == '__main__':
 				xbarstar = np.mean(np.asarray(xstar),axis=0)
 				ybarstar = np.mean(np.asarray(ystar),axis=0)
 				tstar.append(xbarstar - ybarstar)
+			
 			tstar=np.asarray(tstar)
 			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
-			for lat in range(0,tstarobs.shape[1]):
+			for lat in tqdm(range(0,tstarobs.shape[1])):
 				for lon in range(0,tstarobs.shape[2]):
-					p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
-					print(lat,lon)
-					print(tstar[:,0,lat,lon])
-					print(tstarobs[0,lat,lon])
-					print(np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]))
-					print(p)
-					#p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
-					np.append(pvalue, [p])
-			print(pvalue)
-			print(np.max(pvalue))
+					#p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
+					p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+					pvalue[lat,lon] = p
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
@@ -217,10 +209,10 @@ if __name__ == '__main__':
 
 			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
 			if str(sys.argv[9]) == "true":
-				data4 = data_cat3 > 0.05
+				data4 = data_cat3 < 0.05
 				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
 				#data4[abs(data_cat2-data_cat1) < mapticks[(int(len(mapticks))/2)]] = False
-				print( mapticks[(int(len(mapticks))/2)])
+				print( mapticks[(int(len(mapticks))//2)])
 
 			# Set position of subplot and some general settings for cartopy
 			ax=plt.subplot(4,len(reslist),itimes+1,projection=ccrs.NorthPolarStereo())
