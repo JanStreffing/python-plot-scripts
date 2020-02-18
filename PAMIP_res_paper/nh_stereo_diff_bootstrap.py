@@ -1,11 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-<<<<<<< HEAD
-Created on Fri Apr 26 13:12:45 100100
-=======
 Created on Fri Apr 26 13:12:45 2040
->>>>>>> 04535207f478e0c257caf82fa2f78a0ad76b2677
 
 @author: jstreffi-local
 
@@ -23,10 +19,12 @@ Input arguments:
 """
 
 import sys
+import random as rd
 import numpy as np
+import bootstrapped.bootstrap as bs
+import bootstrapped.stats_functions as bs_stats
+from scipy import signal
 from scipy.io import netcdf
-from scipy import interpolate
-import scipy.stats as stats
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LinearSegmentedColormap
@@ -36,6 +34,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import Ngl
 
+np.set_printoptions(threshold=sys.maxsize)
 
 if str(sys.argv[9]) == "true":
 	print("hashing signifcant changes")
@@ -70,9 +69,8 @@ if __name__ == '__main__':
 	print(reslist)
 	itimes=0
 	fig =  plt.figure(figsize=(9,10.6875))
-	#fig = plt.figure(figsize=(12,14.25))
 
-	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
+	for season in [ 'SON' ]:#, 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
 			if res == 'T1279':
 				ensnumber = 60
@@ -152,12 +150,46 @@ if __name__ == '__main__':
 					else:
 						data3[i] =  data3[i][0,5,:,:]
 						data4[i] =  data4[i][0,5,:,:]
-			# Calculating Welch T-test
+
+			# Calculating Bootstrap test
 			print(np.squeeze(data3).shape)
 			print(len(np.squeeze(data3).shape))
 			print(type(data3))
 			print(type(data3[0]))
-			welch = stats.ttest_ind(data3,data4)
+
+			xyobs = np.asarray(np.concatenate([data3,data4]))
+			tstarobs = np.asarray(data2 - data1)
+			tstar = []
+			n = 100
+			m = 100
+			B = n+m
+			
+			for bi in range(B):
+				xstar = []
+				ystar = []
+				for ni in range(n):
+					r = rd.randrange(0, ensnumber*2)
+					xstar.append(xyobs[r])
+				for mi in range(m):
+					r = rd.randrange(0, ensnumber*2)
+					ystar.append(xyobs[r])
+				xbarstar = np.mean(np.asarray(xstar),axis=0)
+				ybarstar = np.mean(np.asarray(ystar),axis=0)
+				tstar.append(xbarstar - ybarstar)
+			tstar=np.asarray(tstar)
+			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
+			for lat in range(0,tstarobs.shape[1]):
+				for lon in range(0,tstarobs.shape[2]):
+					p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
+					print(lat,lon)
+					print(tstar[:,0,lat,lon])
+					print(tstarobs[0,lat,lon])
+					print(np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]))
+					print(p)
+					#p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+					np.append(pvalue, [p])
+			print(pvalue)
+			print(np.max(pvalue))
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
@@ -165,7 +197,7 @@ if __name__ == '__main__':
 			ds1,ds2 = np.hsplit(np.squeeze(data2),2)
 			data_cat2 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
 			if str(sys.argv[9]) == "true":
-				ds1,ds2 = np.hsplit(np.squeeze(welch[1]),2)
+				ds1,ds2 = np.hsplit(np.squeeze(pvalue),2)
 				data_cat3 = np.concatenate((ds2,ds1),axis=1)
 
 			# Loading coords, turning longitude coordiante by 180° to Prime meridian
@@ -185,9 +217,9 @@ if __name__ == '__main__':
 
 			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
 			if str(sys.argv[9]) == "true":
-				data4 = data_cat3 < 0.1
+				data4 = data_cat3 > 0.05
 				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
-				data4[abs(data_cat2-data_cat1) < mapticks[(int(len(mapticks))/2)]] = False
+				#data4[abs(data_cat2-data_cat1) < mapticks[(int(len(mapticks))/2)]] = False
 				print( mapticks[(int(len(mapticks))/2)])
 
 			# Set position of subplot and some general settings for cartopy
@@ -206,7 +238,7 @@ if __name__ == '__main__':
 			print(np.amin(data_cat2-data_cat1))
 			# Plotting
 			if str(sys.argv[9]) == "true":
-			  im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
+				im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
 			im=plt.contourf(lons, lats, data_cat2-data_cat1*debug, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
 			
 			# Adding text labels
@@ -226,7 +258,7 @@ fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.85, top = 0
 cbar_ax = fig.add_axes([0.88, 0.16, 0.03, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=900)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=150)
 
 
 

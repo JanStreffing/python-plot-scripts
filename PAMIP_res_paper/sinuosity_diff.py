@@ -138,7 +138,7 @@ plt.xlabel("Month")
 
 plt.legend([plot159,plot511,plot1279],["TL159","TL511","T1279"],loc=1,prop={'size':10})
 
-fig.savefig(datapath+'sinuosity_diff.png')
+fig.savefig(datapath+'sinuosity_diff.png',dpi=300)
 
 plt.show()
 

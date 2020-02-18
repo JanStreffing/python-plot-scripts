@@ -57,7 +57,7 @@ if __name__ == '__main__':
 		print("hashing signifcant changes")
 
 
-	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
+	for season in [ 'DJF' ]:
 		for res in reslist:
 			if res == 'T1279':
 				ensnumber = 60
@@ -184,18 +184,18 @@ if __name__ == '__main__':
                         if ( itimes == 2 and res == 'T1279' ):
                                 plt.text(.50, 1.05, 'TL1279', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
                         if ( itimes % 3 == 0 ):
-                                plt.text(-0.25, .46, season, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
+                                plt.text(-0.25, .40, param, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
 
                         itimes=itimes+1
 
 fig.subplots_adjust(hspace=0.14, wspace = 0.1, left = 0.15, right = 0.88, top = 0.95, bottom = 0.1)
-cbar_ax = fig.add_axes([0.9, 0.16, 0.02, 0.67])
+cbar_ax = fig.add_axes([0.13, 0.16, 0.79, 0.03])
 cbar_ax.tick_params(labelsize=18) 
-fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
+fig.colorbar(im, cax=cbar_ax, orientation='horizontal', extend='both',ticks=mapticks)
 degree_sign= u'\N{degree sign}'
 fig.text(0.02, 0.5, 'Pressure [hPa]', fontsize=20, va='center', rotation='vertical')
 fig.text(0.5, 0.04, 'Latitude ['+degree_sign+'N]', fontsize=20, ha='center')
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=900)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=300)
 
 
 

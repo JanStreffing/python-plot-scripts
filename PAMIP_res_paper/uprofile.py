@@ -106,4 +106,4 @@ if __name__ == '__main__':
 		degree_sign= u'\N{degree sign}'
 		fig.text(0.4, 0.02, 'Zonal wind speed [m/s]', fontsize=14, va='center')
 		fig.text(0.058, 0.5, 'Latitude ['+degree_sign+'N]', fontsize=14, va='center', rotation='vertical')
-		fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_profile_diff.png', dpi=150)
+		fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_profile_diff.png', dpi=300)

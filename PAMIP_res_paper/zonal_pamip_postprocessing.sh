@@ -1,7 +1,7 @@
 #!/bin/bash
 
 in_mistral="/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/"
-out_mistral="/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/"
+out_mistral="/mnt/lustre01/work/ab0246/a270092/postprocessing/PAMIP/"
 in_juwels=""
 out_juwels=""
 
@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in U T #sin_diff T U UP #iso_diff
+for todo in sin_diff #T_for_doug U_for_doug #SynP sin_diff T U UP #iso_diff
 do
 
 	# t2m hPa zonal plots 
@@ -37,10 +37,14 @@ do
 	fi
 	
         if [[ "$todo" == "UP" ]]; then
-                python profile.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral 14
+                python uprofile.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral 14
         fi
 
-        if [[ "$todo" == "iso_diff" ]]; then
+        if [[ "$todo" == "SynP" ]]; then
+                python synprofile.py 11 16 T159,T511,T1279 Z Z $in_mistral 1 $out_mistral 14
+        fi
+ 
+       if [[ "$todo" == "iso_diff" ]]; then
                 python isohypse_diff.py
 		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/isohypse_diff.png $out_mistral
 	fi
@@ -48,5 +52,15 @@ do
         if [[ "$todo" == "sin_diff" ]]; then
                 python sinuosity_diff.py
 		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/sinuosity_diff.png $out_mistral
+	fi
+
+	if [[ "$todo" == "T_for_doug" ]]; then
+		python zonal_only_DJF.py 11 16 T159,T511,T1279 T T $in_mistral 1 $out_mistral true  -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 14
+		#-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2
+	fi
+
+	if [[ "$todo" == "U_for_doug" ]]; then
+		python zonal_only_DJF.py 11 16 T159,T511,T1279 U U $in_mistral 1 $out_mistral true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 14
+		#-1,-0.75,-0.5,-0.25,-0.1,0.1,0.25,0.5,0.75,1 
 	fi
 done

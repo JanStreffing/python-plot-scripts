@@ -6,14 +6,14 @@ import matplotlib.dates as mdates
 from matplotlib.pylab import *
 import numpy as np
 
-datapath='/mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/'
+datapath='/mnt/lustre01/work/ab0246/a270092/runtime/oifsamip/APPLICATE/'
 modelfactor=9.81
 region="PA"
 
-textfile11=datapath+'sinuosity_Experiment_11T511_'+region+'.txt'
-textfile12=datapath+'sinuosity_Experiment_12T511_'+region+'.txt'
-textfile13=datapath+'sinuosity_Experiment_13T511_'+region+'.txt'
-textfile16=datapath+'sinuosity_Experiment_16T511_'+region+'.txt'
+textfile11=datapath+'sinuosity_Experiment_11T1279_'+region+'.txt'
+textfile12=datapath+'sinuosity_Experiment_12T1279_'+region+'.txt'
+textfile13=datapath+'sinuosity_Experiment_13T1279_'+region+'.txt'
+textfile16=datapath+'sinuosity_Experiment_16T1279_'+region+'.txt'
 
 sinuosity11=np.zeros(12)
 sinuosity12=np.zeros(12)
@@ -98,11 +98,11 @@ ax.xaxis.set_minor_formatter(mdates.DateFormatter("%m"))
 
 matplotlib.pylab.ylim([1,2])
 
-fig.suptitle("Sinuosity Index PAcific PAMIP T511")
+fig.suptitle("Sinuosity Index PAcific PAMIP T1279")
 plt.xlabel("Month")
 
 plt.legend([plot11,plot12,plot13,plot16],["11:pdSST-pdSIC","12:piSST-piSIC","13:piSST-pdSIC","16:pdSST-fuSICArc"],loc=4,prop={'size':10})
 
-fig.savefig(datapath+'sinuosity_'+region+'_t511.png')
+fig.savefig(datapath+'sinuosity_'+region+'_T1279.png')
 
 

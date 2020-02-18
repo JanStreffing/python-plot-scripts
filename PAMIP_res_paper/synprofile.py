@@ -47,13 +47,13 @@ if __name__ == '__main__':
 		for res in reslist:
 			print(itimes)
 			print(res)
-			datapath1[itimes]=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
-			datapath2[itimes]=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
+			datapath1[itimes]=basepath+res+'/Experiment_'+exp1+'/synact/'
+			datapath2[itimes]=basepath+res+'/Experiment_'+exp2+'/synact/'
 
 
 			# Reading netcdf files
-			ncfile1[itimes] = datapath1[itimes]+paramname+'_ensmean_'+season+'_850.nc'
-			ncfile2[itimes] = datapath2[itimes]+paramname+'_ensmean_'+season+'_850.nc'
+			ncfile1[itimes] = datapath1[itimes]+'3D_timstd_'+season+'_zonm.nc'
+			ncfile2[itimes] = datapath2[itimes]+'3D_timstd_'+season+'_zonm.nc'
 
 
 			f[itimes] = netcdf.netcdf_file(ncfile1[itimes], 'r')
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 		plt.plot(data1[2],lat,color="blue",label='TL1279 PD',linestyle=':')
 		plt.plot(data2[2],lat,color="red",label='TL1279 FU',linestyle=':')
 
-		plt.xticks(np.arange(-10, 10.1, step=2.5))
+		plt.xticks(np.arange(0, 1000.1, step=100))
 		plt.axvline(0, color='black', lw=1)
 		plt.legend(loc='lower right')
 		#plt.xlabel('Zonal Wind speed')
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 		plt.plot(data2[2]-data1[2],lat,color="black",label='TL1279 FU-PD',linestyle=':')
 
 		setp(ax2.get_yticklabels(), visible=False)
-		plt.xticks(np.arange(-1, 1.1, step=0.5))
+		plt.xticks(np.arange(-80, 20.1, step=20))
 		plt.axvline(0, color='black', lw=1)
 		plt.legend(loc='lower right')
 
@@ -104,6 +104,6 @@ if __name__ == '__main__':
 		#cbar_ax.tick_params(labelsize=18) 
 		#fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
 		degree_sign= u'\N{degree sign}'
-		fig.text(0.4, 0.02, 'Zonal wind speed [m/s]', fontsize=14, va='center')
+		fig.text(0.4, 0.02, 'Synoptic activity [m]', fontsize=14, va='center')
 		fig.text(0.058, 0.5, 'Latitude ['+degree_sign+'N]', fontsize=14, va='center', rotation='vertical')
-		fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'_profile_diff.png', dpi=150)
+		fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_'+season+'synact_profile.png', dpi=300)
