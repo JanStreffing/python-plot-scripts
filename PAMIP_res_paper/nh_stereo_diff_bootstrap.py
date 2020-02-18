@@ -21,7 +21,6 @@ from __future__ import division
 import sys
 import random as rd
 import numpy as np
-import pandas as pd
 import bootstrapped.bootstrap as bs
 import bootstrapped.stats_functions as bs_stats
 from scipy import signal
@@ -156,26 +155,30 @@ if __name__ == '__main__':
 			# Calculating Bootstrap test
 			xyobs = np.asarray(np.concatenate([data3,data4]))
 			tstarobs = np.asarray(data2 - data1)
-			tstar = []
-			pvalue = []
-			n = 5000
-			m = 5000
+			s1 = tstarobs.shape[1]
+			s2 = tstarobs.shape[2]
+			n = 50
+			m = 50
 			B = n+m
+			tstar = np.array([])
+			pvalue = arange(s1*s2).reshape(s1,s2)
 
 			for bi in tqdm(range(B)):
-				xstar = []
-				ystar = []
+				xstar = np.array([])
+				ystar = np.array([])
 				for ni in range(n):
 					r = rd.randrange(0, ensnumber*2)
-					xstar.append(xyobs[r])
+					xstar = np.vstack((xstar, xyobs[r])) if xstar.size else xyobs[r]
 				for mi in range(m):
 					r = rd.randrange(0, ensnumber*2)
-					ystar.append(xyobs[r])
-				xbarstar = np.mean(np.asarray(xstar),axis=0)
-				ybarstar = np.mean(np.asarray(ystar),axis=0)
-				tstar.append(xbarstar - ybarstar)
+					ystar = np.vstack((ystar, xyobs[r])) if ystar.size else xyobs[r]
+				xbarstar = np.mean(xstar,axis=0)
+				ybarstar = np.mean(ystar,axis=0)
+				tstar = np.dstack((tstar, xbarstar - ybarstar)) if tstar.size else xbarstar - ybarstar
+			tstar = np.swapaxes(tstar,0,2)
+			#tstar = np.swapaxes(tstar,1,2)
+			print(tstar.shape)
 			
-			tstar=np.asarray(tstar)
 			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
 			for lat in tqdm(range(0,tstarobs.shape[1])):
 				for lon in range(0,tstarobs.shape[2]):
