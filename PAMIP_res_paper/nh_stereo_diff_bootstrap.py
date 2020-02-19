@@ -37,6 +37,42 @@ from tqdm import tqdm
 
 np.set_printoptions(threshold=sys.maxsize)
 
+
+def bootstrap(xyobs, data1, data2):
+	tstarobs = np.asarray(data2 - data1)
+	s1 = tstarobs.shape[1]
+	s2 = tstarobs.shape[2]
+	n = xyobs.shape/2
+	m = xyobs.shape/2
+	B = 10000
+	tstar = np.array([])
+	pvalue = arange(s1*s2).reshape(s1,s2)
+
+	for bi in tqdm(range(0,B)):
+		xstar = np.array([])
+		ystar = np.array([])
+		for ni in range(0,n):
+			r = rd.randrange(0, ensnumber*2)
+			xstar = np.vstack((xstar, xyobs[r])) if xstar.size else xyobs[r]
+		for mi in range(0,m):
+			r = rd.randrange(0, ensnumber*2)
+			ystar = np.vstack((ystar, xyobs[r])) if ystar.size else xyobs[r]
+		xbarstar = np.mean(xstar,axis=0)
+		ybarstar = np.mean(ystar,axis=0)
+		tstar = np.dstack((tstar, xbarstar - ybarstar)) if tstar.size else xbarstar - ybarstar
+	tstar = np.swapaxes(tstar,0,2)
+	tstar = np.swapaxes(tstar,1,2)
+	print(tstar.shape)
+	
+	pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
+	for lat in tqdm(range(0,tstarobs.shape[1])):
+		for lon in range(0,tstarobs.shape[2]):
+			#p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B # Seems to work the same as line below
+			p = tstar[:,lat,lon][tstar[:,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+			pvalue[lat,lon] = p
+	return pvalue
+
+
 if str(sys.argv[9]) == "true":
 	print("hashing signifcant changes")
 
@@ -154,37 +190,7 @@ if __name__ == '__main__':
 
 			# Calculating Bootstrap test
 			xyobs = np.asarray(np.concatenate([data3,data4]))
-			tstarobs = np.asarray(data2 - data1)
-			s1 = tstarobs.shape[1]
-			s2 = tstarobs.shape[2]
-			n = 50
-			m = 50
-			B = n+m
-			tstar = np.array([])
-			pvalue = arange(s1*s2).reshape(s1,s2)
-
-			for bi in tqdm(range(0,B)):
-				xstar = np.array([])
-				ystar = np.array([])
-				for ni in range(0,n):
-					r = rd.randrange(0, ensnumber*2)
-					xstar = np.vstack((xstar, xyobs[r])) if xstar.size else xyobs[r]
-				for mi in range(0,m):
-					r = rd.randrange(0, ensnumber*2)
-					ystar = np.vstack((ystar, xyobs[r])) if ystar.size else xyobs[r]
-				xbarstar = np.mean(xstar,axis=0)
-				ybarstar = np.mean(ystar,axis=0)
-				tstar = np.dstack((tstar, xbarstar - ybarstar)) if tstar.size else xbarstar - ybarstar
-			tstar = np.swapaxes(tstar,0,2)
-			tstar = np.swapaxes(tstar,1,2)
-			print(tstar.shape)
-			
-			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
-			for lat in tqdm(range(0,tstarobs.shape[1])):
-				for lon in range(0,tstarobs.shape[2]):
-					#p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
-					p = tstar[:,lat,lon][tstar[:,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
-					pvalue[lat,lon] = p
+			pavalue = bootstrap(xyobs, data1, data2)
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
