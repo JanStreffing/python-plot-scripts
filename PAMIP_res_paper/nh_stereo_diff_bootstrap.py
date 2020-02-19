@@ -38,6 +38,37 @@ from tqdm import tqdm
 
 np.set_printoptions(threshold=sys.maxsize)
 
+
+def bootstrap(xyobs, data1, data2):
+	tstarobs = np.asarray(data2 - data1)
+	tstar = []
+	pvalue = []
+	n = 300
+	m = 300
+	B = n+m
+
+	for bi in tqdm(range(B)):
+		xstar = []
+		ystar = []
+		for ni in range(n):
+			r = rd.randrange(0, ensnumber*2)
+			xstar.append(xyobs[r])
+		for mi in range(m):
+			r = rd.randrange(0, ensnumber*2)
+			ystar.append(xyobs[r])
+		xbarstar = np.mean(np.asarray(xstar),axis=0)
+		ybarstar = np.mean(np.asarray(ystar),axis=0)
+		tstar.append(xbarstar - ybarstar)
+
+	tstar=np.asarray(tstar)
+	pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
+	for lat in tqdm(range(0,tstarobs.shape[1])):
+		for lon in range(0,tstarobs.shape[2]):
+			p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+			pvalue[lat,lon] = p
+  	return pvalue
+
+
 if str(sys.argv[9]) == "true":
 	print("hashing signifcant changes")
 
@@ -155,33 +186,7 @@ if __name__ == '__main__':
 
 			# Calculating Bootstrap test
 			xyobs = np.asarray(np.concatenate([data3,data4]))
-			tstarobs = np.asarray(data2 - data1)
-			tstar = []
-			pvalue = []
-			n = 5000
-			m = 5000
-			B = n+m
-
-			for bi in tqdm(range(B)):
-				xstar = []
-				ystar = []
-				for ni in range(n):
-					r = rd.randrange(0, ensnumber*2)
-					xstar.append(xyobs[r])
-				for mi in range(m):
-					r = rd.randrange(0, ensnumber*2)
-					ystar.append(xyobs[r])
-				xbarstar = np.mean(np.asarray(xstar),axis=0)
-				ybarstar = np.mean(np.asarray(ystar),axis=0)
-				tstar.append(xbarstar - ybarstar)
-			
-			tstar=np.asarray(tstar)
-			pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
-			for lat in tqdm(range(0,tstarobs.shape[1])):
-				for lon in range(0,tstarobs.shape[2]):
-					#p = np.sum(tstar[:,0,lat,lon] >= tstarobs[0,lat,lon])/B
-					p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
-					pvalue[lat,lon] = p
+			pvalue = bootstrap(xyobs, data1, data2)
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
