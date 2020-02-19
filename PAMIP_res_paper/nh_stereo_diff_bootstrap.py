@@ -35,34 +35,45 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import Ngl
 from tqdm import tqdm
+import dask
+from dask.delayed import delayed
+from dask.diagnostics import ProgressBar
+from ttictoc import TicToc
+t = TicToc() ## TicToc("name")
 
 np.set_printoptions(threshold=sys.maxsize)
 
+def resample(xyobs,n,m):
+	xstar = []
+	ystar = []
+	for ni in range(n):
+		r = rd.randrange(0, xyobs.shape[0])
+		xstar.append(xyobs[r])
+	for mi in range(m):
+		r = rd.randrange(0, xyobs.shape[0])
+		ystar.append(xyobs[r])
+	xbarstar = np.mean(np.asarray(xstar),axis=0)
+	ybarstar = np.mean(np.asarray(ystar),axis=0)
+	t = xbarstar - ybarstar
+	return t
 
 def bootstrap(xyobs, data1, data2):
 	tstarobs = np.asarray(data2 - data1)
 	tstar = []
+	ta = []
 	pvalue = []
 	n = xyobs.shape[0]//2
-	print (n)
 	m = xyobs.shape[0]//2
-	B = 10000
+	B = 100
 
 	for bi in tqdm(range(B)):
-		xstar = []
-		ystar = []
-		for ni in range(n):
-			r = rd.randrange(0, ensnumber*2)
-			xstar.append(xyobs[r])
-		for mi in range(m):
-			r = rd.randrange(0, ensnumber*2)
-			ystar.append(xyobs[r])
-		xbarstar = np.mean(np.asarray(xstar),axis=0)
-		ybarstar = np.mean(np.asarray(ystar),axis=0)
-		tstar.append(xbarstar - ybarstar)
-
-	tstar=np.asarray(tstar)
-	pvalue= np.empty((tstarobs.shape[1],tstarobs.shape[2]))
+		t = dask.delayed(resample)(xyobs,n,m)
+		ta.append(t)
+	with ProgressBar():
+		tstar = dask.compute(ta)
+	tstar = np.squeeze(np.asarray(tstar), axis = 0)
+	print(tstar.shape)
+	pvalue = np.empty((tstarobs.shape[1],tstarobs.shape[2]))
 	for lat in tqdm(range(0,tstarobs.shape[1])):
 		for lon in range(0,tstarobs.shape[2]):
 			p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
@@ -187,7 +198,10 @@ if __name__ == '__main__':
 
 			# Calculating Bootstrap test
 			xyobs = np.asarray(np.concatenate([data3,data4]))
+			t.tic()
 			pvalue = bootstrap(xyobs, data1, data2)
+			t.toc()
+			print(t.elapsed)
 
 			# Split data and concatenate in reverse order to turn by 180° to Prime meridian
 			ds1,ds2 = np.hsplit(np.squeeze(data1),2)
