@@ -35,9 +35,21 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import Ngl
 from tqdm import tqdm
+import dask
+from dask.delayed import delayed
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
+@delayed(nout=2)
+def resample(xyobs,n,m,xstar,ystar):
+	for ni in range(n):
+		r = rd.randrange(0, ensnumber*2)
+		xstar.append(xyobs[r])
+	for mi in range(m):
+		r = rd.randrange(0, ensnumber*2)
+		ystar.append(xyobs[r])
+	return xstar, ystar
 
 def bootstrap(xyobs, data1, data2):
 	tstarobs = np.asarray(data2 - data1)
@@ -51,12 +63,9 @@ def bootstrap(xyobs, data1, data2):
 	for bi in tqdm(range(B)):
 		xstar = []
 		ystar = []
-		for ni in range(n):
-			r = rd.randrange(0, ensnumber*2)
-			xstar.append(xyobs[r])
-		for mi in range(m):
-			r = rd.randrange(0, ensnumber*2)
-			ystar.append(xyobs[r])
+		x, y = resample(xyobs,n,m,xstar,ystar)
+		xstar = dask.compute(x)
+		ystar = dask.compute(y)
 		xbarstar = np.mean(np.asarray(xstar),axis=0)
 		ybarstar = np.mean(np.asarray(ystar),axis=0)
 		tstar.append(xbarstar - ybarstar)
