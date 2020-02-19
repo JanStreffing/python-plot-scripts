@@ -43,9 +43,10 @@ def bootstrap(xyobs, data1, data2):
 	tstarobs = np.asarray(data2 - data1)
 	tstar = []
 	pvalue = []
-	n = 300
-	m = 300
-	B = n+m
+	n = xyobs.shape[0]//2
+	print (n)
+	m = xyobs.shape[0]//2
+	B = 10000
 
 	for bi in tqdm(range(B)):
 		xstar = []
