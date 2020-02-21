@@ -76,7 +76,9 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = np.empty((tstarobs.shape[1],tstarobs.shape[2]))
 	for lat in tqdm(range(0,tstarobs.shape[1])):
 		for lon in range(0,tstarobs.shape[2]):
-			p = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+			p1 = tstar[:,0,lat,lon][tstar[:,0,lat,lon] >= tstarobs[0,lat,lon]].shape[0]/B
+			p2 = tstar[:,0,lat,lon][tstar[:,0,lat,lon] <= -tstarobs[0,lat,lon]].shape[0]/B
+			p = p1 + p2
 			pvalue[lat,lon] = p
   	return pvalue
 
@@ -115,7 +117,7 @@ if __name__ == '__main__':
 	itimes=0
 	fig =  plt.figure(figsize=(9,10.6875))
 
-	for season in [ 'SON' ]:#, 'DJF', 'MAM', 'JJA' ]:
+	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
 		for res in reslist:
 			if res == 'T1279':
 				ensnumber = 60
@@ -166,8 +168,6 @@ if __name__ == '__main__':
 					for i in range(ensnumber):
 						ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
 						ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-						print ncfile3
-						print ncfile4
 						dataset3.append(Dataset(ncfile3))
 						dataset4.append(Dataset(ncfile4))
 						
@@ -178,7 +178,6 @@ if __name__ == '__main__':
 				for i in range(ensnumber):
 					data3.append(dataset3[i].variables[param][:])
 					data4.append(dataset4[i].variables[param][:])
-
 
 			# in case data has multiple levels, select only the (50000 hPa) 
 			if (len(np.squeeze(data1).shape)) == 3:
@@ -217,19 +216,14 @@ if __name__ == '__main__':
 			lats = dataset1.variables[u'lat'][:]
 
 			# add cyclic point to data array and longitude
-			print(data_cat1.shape)
-			print(data_cat2.shape)
 			data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
 			data_cat2 = Ngl.add_cyclic(data_cat2)	
-			print(data_cat1.shape)
-			print(data_cat2.shape)
 			if str(sys.argv[9]) == "true":
 				data_cat3 = Ngl.add_cyclic(data_cat3)	
 
-
 			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
 			if str(sys.argv[9]) == "true":
-				data4 = data_cat3 < 0.05
+				data4 = abs(data_cat3) < 0.05
 				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
 				#data4[abs(data_cat2-data_cat1) < mapticks[(int(len(mapticks))/2)]] = False
 				print( mapticks[(int(len(mapticks))//2)])
@@ -246,12 +240,12 @@ if __name__ == '__main__':
 
 			cmap_TR.set_over("darkred")
 			cmap_TR.set_under("deeppink")
-			print(np.amax(data_cat2-data_cat1))
-			print(np.amin(data_cat2-data_cat1))
+
 			# Plotting
-			if str(sys.argv[9]) == "true":
-				im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
-			im=plt.contourf(lons, lats, data_cat2-data_cat1*debug, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			#if str(sys.argv[9]) == "true":
+			#	im=plt.contourf(lons, lats, data4, hatches=[' ','....'],cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=2, alpha=0)
+			#im=plt.contourf(lons, lats, data_cat2-data_cat1*debug, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			im=plt.contourf(lons, lats, data_cat3, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
 			
 			# Adding text labels
                         if ( itimes == 0 and res == 'T159' ):

@@ -22,7 +22,7 @@ out_mistral="/mnt/lustre01/work/ab0246/a270092/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M #MSL z500 forcing #haus U SD forcing synact
+for todo in MSL #T2M MSL z500 forcing #haus U SD forcing synact
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then
@@ -32,7 +32,7 @@ do
 
 	# t2m hPa polar plots 
 	if [[ "$todo" == "T2M" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T1279 T2M T2M $in_mistral 1 $out_mistral true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
+		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 T2M T2M $in_mistral 1 $out_mistral true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
 	fi
 
 
