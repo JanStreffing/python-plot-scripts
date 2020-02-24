@@ -20,17 +20,25 @@ from __future__ import division
 import sys
 import random as rd
 import numpy as np
+import pandas as pd
+import bootstrapped.bootstrap as bs
+import bootstrapped.stats_functions as bs_stats
+from scipy import signal
+from scipy.io import netcdf
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 from netCDF4 import Dataset
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import Ngl
 from tqdm import tqdm
 import dask
 from dask.delayed import delayed
 from dask.diagnostics import ProgressBar
-from datetime import datetime
-from datetime import timedelta
+from ttictoc import TicToc
+t = TicToc() ## TicToc("name")
 
 def resample(xyobs,n,m):
         xstar = []
@@ -53,7 +61,7 @@ def bootstrap(xyobs, data1, data2):
         pvalue = []
         n = xyobs.shape[0]//2
         m = xyobs.shape[0]//2
-        B = 1000
+        B = 100
 
         for bi in tqdm(range(B)):
                 t = dask.delayed(resample)(xyobs,n,m)
@@ -61,12 +69,14 @@ def bootstrap(xyobs, data1, data2):
         with ProgressBar():
                 tstar = dask.compute(ta)
         tstar = np.squeeze(np.asarray(tstar), axis = 0)
-        pvalue = np.empty((tstarobs.shape[2],tstarobs.shape[1]))
+        pvalue = np.empty((tstarobs.shape[1],tstarobs.shape[2]))
         for plev in tqdm(range(0,tstarobs.shape[2])):
                 for time in range(0,tstarobs.shape[1]):
+			print(np.asarray(tstarobs).shape)
                         p1 = tstar[:,0,time,plev][tstar[:,0,time,plev] >= tstarobs[0,time,plev]].shape[0]/B
-                        p2 = tstar[:,0,time,plev][tstar[:,0,time,plev] >= -tstarobs[0,time,plev]].shape[0]/B
-                        pvalue[plev,time] = min(p1,p2)
+                        p2 = tstar[:,0,time,plev][tstar[:,0,time,plev] <= -tstarobs[0,time,plev]].shape[0]/B
+                        p = p1 + p2
+                        pvalue[time,plev] = p
         return pvalue
 
 
@@ -92,7 +102,6 @@ if __name__ == '__main__':
 		from colorbar_TR_70 import cmap_TR
 
 	for res in reslist:
-
 # --- Loading data
 		if res == 'T1279':
 			ensnumber = 60
@@ -114,30 +123,30 @@ if __name__ == '__main__':
 		mean1 = np.mean(np.asarray(data1),axis=0,keepdims=1)
 		mean2 = np.mean(np.asarray(data2),axis=0,keepdims=1)
 		xyobs = np.expand_dims(np.concatenate([data1,data2]),axis=1)
+		print(np.asarray(xyobs).shape)
 
 # --- Bootstrap hypothesis testing
+		t.tic()
 		pvalue = bootstrap(xyobs, mean1, mean2)
+		t.toc()
+		print(t.elapsed)
+
 
 # --- Preparation for plots
-		fig, ax = plt.subplots(figsize=(10,5))
+		fig = plt.figure(figsize=(10, 6))
 		cmap_TR.set_over("darkred")
 		cmap_TR.set_under("deeppink")
 		mean1 = np.transpose(mean1)
 		mean2 = np.transpose(mean2)
 		plt.yscale('log',basey=10) 
 		plt.gca().invert_yaxis()
-		startdate = datetime(2000, 11, 1, 0, 0)
-		plttime = [None]*len(time)
-		for t in range(len(time)):
-			plttime[t] = startdate+timedelta(hours=6*t)
 
 # --- Plot absolute data
-		s5=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.05], linestyles='-' ,colors='black' ,zorder=3)
-		s20=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.20], linestyles='--' ,colors='black' ,zorder=2)
-		im=plt.contourf(plttime, plev, np.squeeze(mean1-mean2), levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
-		cbar = fig.colorbar(im)
+		print(len(time))
+		print(len(plev))
+		print(mean1.shape)
+		im=plt.contourf(time, plev, mean2-mean1, levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
 
-		ax.xaxis.set_tick_params(rotation=30)
 		#plt.xticks(np.arange(-10, 10.1, step=2.5))
 		#plt.axvline(0, color='black', lw=1)
 		#plt.legend(loc='lower right')
@@ -146,4 +155,4 @@ if __name__ == '__main__':
 		#degree_sign= u'\N{degree sign}'
 		#fig.text(0.4, 0.02, 'Zonal wind speed [m/s]', fontsize=14, va='center')
 		#fig.text(0.058, 0.5, 'Latitude ['+degree_sign+'N]', fontsize=14, va='center', rotation='vertical')
-		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_'+res+'_diff.png', dpi=150)
+		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_diff.png', dpi=150)

@@ -198,6 +198,7 @@ if __name__ == '__main__':
 			# Calculating Bootstrap test
 			xyobs = np.asarray(np.concatenate([data3,data4]))
 			t.tic()
+			print(np.asarray(data1).shape)
 			pvalue = bootstrap(xyobs, data1, data2)
 			t.toc()
 			print(t.elapsed)

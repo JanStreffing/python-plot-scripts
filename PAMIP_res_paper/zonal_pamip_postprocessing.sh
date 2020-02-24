@@ -25,7 +25,7 @@ for todo in pch #sin_diff T_for_doug U_for_doug #SynP sin_diff T U UP #iso_diff
 do
 
         if [[ "$todo" == "pch" ]]; then
-                python polar_cap_height.py 11 16 T159 Z Z $in 1 $out true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 14
+                python polar_cap_height.py 11 16 T159 Z Z $in 1 $out true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_70 14
         fi
 
 	# t2m hPa zonal plots 
