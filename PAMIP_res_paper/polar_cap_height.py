@@ -102,7 +102,7 @@ if __name__ == '__main__':
 		datapath2=basepath+res+'/Experiment_'+exp2+'/polarch/'
 		data1 = []
 		data2 = []
-		for i in range(101, ensnumber+100):
+		for i in range(100, ensnumber+100):
 			ncfile1 = datapath1+'pch_'+exp1+'_'+str(i+1).zfill(3)+'.nc'
 			ncfile2 = datapath2+'pch_'+exp2+'_'+str(i+1).zfill(3)+'.nc'
 			data1.append(Dataset(ncfile1).variables[param][:]/(9.81*100))
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 		pvalue = bootstrap(xyobs, mean1, mean2)
 
 # --- Preparation for plots
-		fig, ax = plt.subplots(figsize=(10,5))
+		fig, ax = plt.subplots(figsize=(10,6))
 		cmap_TR.set_over("darkred")
 		cmap_TR.set_under("deeppink")
 		mean1 = np.transpose(mean1)
@@ -132,8 +132,8 @@ if __name__ == '__main__':
 			plttime[t] = startdate+timedelta(hours=6*t)
 
 # --- Plot absolute data
-		s5=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.05], linestyles='-' ,colors='black' ,zorder=3)
-		s20=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.20], linestyles='--' ,colors='black' ,zorder=2)
+		s5=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.025], linestyles='-' ,colors='black' ,zorder=3)
+		s20=plt.contour(plttime, plev, np.squeeze(pvalue), levels=[0.10], linestyles='--' ,colors='black' ,zorder=2)
 		im=plt.contourf(plttime, plev, np.squeeze(mean1-mean2), levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
 		cbar = fig.colorbar(im)
 
