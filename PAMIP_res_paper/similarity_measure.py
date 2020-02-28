@@ -54,17 +54,18 @@ def resample_inner_loop(data):
 def resample(data):
 	B=10
 	res = []
+	resample = []
+	resmaple_intermean = []
 	for b in range(B):
 		res.append(dask.delayed(resample_inner_loop)(data))
         with ProgressBar():
                 resample = dask.compute(res)
-		resample_itermean = mean(resample,axis=1)
-	return np.squeeze(np.asarray(resample_itermean))
+	resample_itermean = np.mean(np.squeeze(np.asarray(resample)),axis=0)
+	return resample_itermean
 
 
 def read_inner(ncfile1, param):
 	data1 = Dataset(ncfile1).variables[param][:]
-	print (np.asarray(data1).shape)
 	return data1
 
 
@@ -85,7 +86,8 @@ def read_file_squ(ensnumber,datapath1,paramname,param):
 		d.append(read_inner(ncfile1, param))
 	return d
 
-
+def get_rmse(i,res,mean):
+	return np.sqrt(((res[i] - mean) ** 2).mean())
 
 if __name__ == '__main__':
 	exp1=str(sys.argv[1])
@@ -96,31 +98,28 @@ if __name__ == '__main__':
 	param=str(sys.argv[4])
 	paramname=str(sys.argv[5])
 	reslist=map(str, sys.argv[3].split(','))
-	print(reslist)
+	print("Resolutions:",reslist)
 	itimes=0
 	fig =  plt.figure(figsize=(9,10.6875))
 
-	for res in reslist:
-		if res == 'T1279':
-			ensnumber = 100
+	for resolution in reslist:
+		if resolution == 'T1279':
+			ensnumber = 6
 		else:
-			ensnumber = 300
-		datapath1=basepath+res+'/Experiment_'+exp1+'/'
-		#datapath2=basepath+res+'/Experiment_'+exp2+'/'    
-		data1=[]
-		#data2=[]
-
+			ensnumber = 6
+		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
 		
-		#d = read_file_par(ensnumber,datapath1,paramname,param)
-		d = read_file_squ(ensnumber,datapath1,paramname,param)
-
-		print(np.asarray(d).shape)
+		d = read_file_par(ensnumber,datapath1,paramname,param)
+		#d = read_file_squ(ensnumber,datapath1,paramname,param)
+		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
 # --- Resampling	
-		res = resample(data1)
-		print(np.asarray(res).shape)
+		res = resample(np.squeeze(d))
 
-		mean = np.mean(np.asarray(data1), axis=0)
+		mean = np.mean(np.asarray(d), axis=0)
 		rmse = []
 		for i in range(0,len(res)-1):
-			rmse.append(np.sqrt(((res[i] - mean) ** 2).mean()))
-		print(rmse)
+			rmse.append(dask.delayed(get_rmse)(i,res,mean))
+			#rmse.append(np.sqrt(((res[i] - mean) ** 2).mean()))
+        	with ProgressBar():
+               		rmse_final = dask.compute(rmse)
+		print(rmse_final)
