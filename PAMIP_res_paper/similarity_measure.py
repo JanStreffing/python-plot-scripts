@@ -38,7 +38,6 @@ from dask.diagnostics import ProgressBar
 from ttictoc import TicToc
 t = TicToc() ## TicToc("name")
 
-
 def resample_inner_loop(data):
 	resample_inner = []
 	#resample_inner = np.array([])
@@ -52,7 +51,7 @@ def resample_inner_loop(data):
 
 
 def resample(data):
-	B=10
+	B=100
 	res = []
 	resample = []
 	resmaple_intermean = []
@@ -101,25 +100,35 @@ if __name__ == '__main__':
 	print("Resolutions:",reslist)
 	itimes=0
 	fig =  plt.figure(figsize=(9,10.6875))
-
+	rmse_list = []
 	for resolution in reslist:
 		if resolution == 'T1279':
-			ensnumber = 6
+			ensnumber = 60
 		else:
-			ensnumber = 6
+			ensnumber = 60
+
 		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
 		
 		d = read_file_par(ensnumber,datapath1,paramname,param)
-		#d = read_file_squ(ensnumber,datapath1,paramname,param)
 		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
+
 # --- Resampling	
 		res = resample(np.squeeze(d))
 
-		mean = np.mean(np.asarray(d), axis=0)
+# --- Calculating RMSE
+		mean = np.mean(np.squeeze(np.asarray(d)), axis=0)
 		rmse = []
 		for i in range(0,len(res)-1):
-			rmse.append(dask.delayed(get_rmse)(i,res,mean))
-			#rmse.append(np.sqrt(((res[i] - mean) ** 2).mean()))
+			rmse.append(get_rmse(i,res,mean))
+			#rmse.append(dask.delayed(get_rmse)(i,res,mean))
         	with ProgressBar():
                		rmse_final = dask.compute(rmse)
-		print(rmse_final)
+		rmse_list.append(np.squeeze(np.asarray(rmse_final)))
+	
+	fig = plt.figure(figsize=(10,5))
+	T159, = plt.plot(rmse_list[0], color='blue', label="TL159")
+	T511, = plt.plot(rmse_list[1], color='red', label="TL511")
+	T1279, = plt.plot(rmse_list[2], color='green', label="TL1279")
+	plt.legend(handles=[T159, T511, T1279])
+	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=150)
+		
