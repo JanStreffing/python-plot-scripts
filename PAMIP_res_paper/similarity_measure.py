@@ -51,7 +51,7 @@ def resample_inner_loop(data):
 
 
 def resample(data):
-	B=100
+	B=30
 	res = []
 	resample = []
 	resmaple_intermean = []
@@ -104,7 +104,9 @@ if __name__ == '__main__':
 	for resolution in reslist:
 		if resolution == 'T1279':
 			ensnumber = 60
-		else:
+		elif resolution == 'T511':
+			ensnumber = 60
+		elif resolution == 'T159':
 			ensnumber = 60
 
 		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
@@ -125,10 +127,14 @@ if __name__ == '__main__':
                		rmse_final = dask.compute(rmse)
 		rmse_list.append(np.squeeze(np.asarray(rmse_final)))
 	
+	x = np.linspace(1,ensnumber,60)
+	y = 1/sqrt(x)*np.mean(np.asarray(rmse_list),axis=0)[0]
+
 	fig = plt.figure(figsize=(10,5))
 	T159, = plt.plot(rmse_list[0], color='blue', label="TL159")
 	T511, = plt.plot(rmse_list[1], color='red', label="TL511")
 	T1279, = plt.plot(rmse_list[2], color='green', label="TL1279")
-	plt.legend(handles=[T159, T511, T1279])
+	comp, = plt.plot(y, color='black', label="1/sqrt(x)")
+	plt.legend(handles=[T159, T511, T1279, comp])
 	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=150)
 		

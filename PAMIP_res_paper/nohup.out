@@ -1,0 +1,5 @@
+/p/project/chhb19/jstreffi/software/miniconda3/envs/pyn_env_py2/lib/python2.7/site-packages/dask/config.py:168: YAMLLoadWarning: calling yaml.load() without Loader=... is deprecated, as the default Loader is unsafe. Please read https://msg.pyyaml.org/load for full details.
+  data = yaml.load(f.read()) or {}
+XIO:  fatal IO error 0 (Success) on X server "localhost:18.0"
+      after 292 requests (292 known processed) with 12 events remaining.
+('Resolutions:', ['T159', 'T511', 'T1279'])
