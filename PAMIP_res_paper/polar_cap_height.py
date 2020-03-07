@@ -53,7 +53,7 @@ def bootstrap(xyobs, data1, data2):
         pvalue = []
         n = xyobs.shape[0]//2
         m = xyobs.shape[0]//2
-        B = 1000
+        B = 10000
 
         for bi in tqdm(range(B)):
                 t = dask.delayed(resample)(xyobs,n,m)
@@ -95,14 +95,19 @@ if __name__ == '__main__':
 
 # --- Loading data
 		if res == 'T1279':
-			ensnumber = 60
-		else:
-			ensnumber = 200
+			start = 60
+			end   = 100
+		if res == 'T511':
+			start = 100
+			end   = 200
+		if res == 'T159':
+			start = 100
+			end   = 300
 		datapath1=basepath+res+'/Experiment_'+exp1+'/polarch/'
 		datapath2=basepath+res+'/Experiment_'+exp2+'/polarch/'
 		data1 = []
 		data2 = []
-		for i in range(100, ensnumber+100):
+		for i in range(start, end):
 			ncfile1 = datapath1+'pch_'+exp1+'_'+str(i+1).zfill(3)+'.nc'
 			ncfile2 = datapath2+'pch_'+exp2+'_'+str(i+1).zfill(3)+'.nc'
 			data1.append(Dataset(ncfile1).variables[param][:]/(9.81*100))
