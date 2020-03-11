@@ -50,8 +50,7 @@ def resample_inner_loop(data):
 	return resample_inner
 
 
-def resample(data):
-	B=30
+def resample(B,data):
 	res = []
 	resample = []
 	resmaple_intermean = []
@@ -59,8 +58,7 @@ def resample(data):
 		res.append(dask.delayed(resample_inner_loop)(data))
         with ProgressBar():
                 resample = dask.compute(res)
-	resample_itermean = np.mean(np.squeeze(np.asarray(resample)),axis=0)
-	return resample_itermean
+	return np.squeeze(np.asarray(resample))
 
 
 def read_inner(ncfile1, param):
@@ -85,8 +83,12 @@ def read_file_squ(ensnumber,datapath1,paramname,param):
 		d.append(read_inner(ncfile1, param))
 	return d
 
-def get_rmse(i,res,mean):
-	return np.sqrt(((res[i] - mean) ** 2).mean())
+def get_rmse(B,i,res,mean):
+	rmse = []
+	for b in range(B):
+		rmse.append(np.sqrt(((res[b,i] - mean) ** 2).mean()))
+	return np.mean(rmse,axis=0)
+
 
 if __name__ == '__main__':
 	exp1=str(sys.argv[1])
@@ -99,8 +101,8 @@ if __name__ == '__main__':
 	reslist=map(str, sys.argv[3].split(','))
 	print("Resolutions:",reslist)
 	itimes=0
-	fig =  plt.figure(figsize=(9,10.6875))
 	rmse_list = []
+	B=300
 	for resolution in reslist:
 		if resolution == 'T1279':
 			ensnumber = 60
@@ -115,13 +117,13 @@ if __name__ == '__main__':
 		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
 
 # --- Resampling	
-		res = resample(np.squeeze(d))
+		res = resample(B,np.squeeze(d))
 
 # --- Calculating RMSE
 		mean = np.mean(np.squeeze(np.asarray(d)), axis=0)
 		rmse = []
-		for i in range(0,len(res)-1):
-			rmse.append(get_rmse(i,res,mean))
+		for i in range(0,ensnumber):
+			rmse.append(get_rmse(B,i,res,mean))
 			#rmse.append(dask.delayed(get_rmse)(i,res,mean))
         	with ProgressBar():
                		rmse_final = dask.compute(rmse)
@@ -130,11 +132,11 @@ if __name__ == '__main__':
 	x = np.linspace(1,ensnumber,60)
 	y = 1/sqrt(x)*np.mean(np.asarray(rmse_list),axis=0)[0]
 
-	fig = plt.figure(figsize=(10,5))
+	fig = plt.figure(figsize=(5,2.5))
 	T159, = plt.plot(rmse_list[0], color='blue', label="TL159")
 	T511, = plt.plot(rmse_list[1], color='red', label="TL511")
 	T1279, = plt.plot(rmse_list[2], color='green', label="TL1279")
-	comp, = plt.plot(y, color='black', label="1/sqrt(x)")
+	comp, = plt.plot(y, color='black', label="1/sqrt(n)")
 	plt.legend(handles=[T159, T511, T1279, comp])
-	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=150)
+	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=600)
 		

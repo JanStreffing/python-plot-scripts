@@ -1,12 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-<<<<<<< HEAD
 Created on Fri Apr 26 13:12:45 100100
-=======
-Created on Fri Apr 26 13:12:45 2040
->>>>>>> 04535207f478e0c257caf82fa2f78a0ad76b2677
-
 @author: jstreffi-local
 
 Input arguments:
@@ -227,6 +222,5 @@ cbar_ax = fig.add_axes([0.88, 0.16, 0.03, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=900)
-
 
 
