@@ -31,8 +31,7 @@ import matplotlib.ticker as mticker
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 from netCDF4 import Dataset
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+from mpl_toolkits.basemap import Basemap
 import Ngl
 from tqdm import tqdm
 import dask
@@ -72,7 +71,6 @@ def bootstrap(xyobs, data1, data2):
 	with ProgressBar():
 		tstar = dask.compute(ta)
 	tstar = np.squeeze(np.asarray(tstar), axis = 0)
-	print('Bootstrap size',tstar.shape)
 	pvalue = np.empty((tstarobs.shape[0],tstarobs.shape[1]))
 	for lat in tqdm(range(0,tstarobs.shape[0])):
 		for lon in range(0,tstarobs.shape[1]):
@@ -107,7 +105,7 @@ if __name__ == '__main__':
 		debug = 1
 		area = 29
 
-	mapticks=map(float, sys.argv[10].split(','))
+	mapticks=np.asarray(map(float, sys.argv[10].split(',')))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
 	fig =  plt.figure(figsize=(9,6))
@@ -120,9 +118,9 @@ if __name__ == '__main__':
 	for res in reslist:
 		print('reading files for',res)
 		if res == 'T1279':
-			ensnumber = 300
+			ensnumber = 100
 		if res == 'T511':
-			ensnumber = 200
+			ensnumber = 100
 		if res == 'T159':
 			ensnumber = 100
 		if paramname == 'synact':
@@ -138,14 +136,11 @@ if __name__ == '__main__':
 			ncfile2 = datapath2+'3D_timstd_'+season+'.nc'
 			dataset1 = Dataset(ncfile1)
 			dataset2 = Dataset(ncfile2)
-			print ncfile1
-			print ncfile2
 
 			if str(sys.argv[9]) == "true":
 				for i in range(ensnumber):
 				     ncfile3 = datapath1+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
 				     ncfile4 = datapath2+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
-				     print ncfile3
 				     dataset3.append(Dataset(ncfile3))
 				     dataset4.append(Dataset(ncfile4))
 		else:
@@ -229,24 +224,24 @@ if __name__ == '__main__':
 		data_cat2 = Ngl.add_cyclic(data_cat2)	
 		data_cat3 = Ngl.add_cyclic(data_cat3)	
 
-		# Set position of subplot and some general settings for cartopy
-		ax=plt.subplot(2,3,itimes+1,projection=ccrs.NorthPolarStereo())
-		ax.set_extent([-180, 180, area, area], ccrs.PlateCarree())
-		ax.add_feature(cfeature.COASTLINE)
-
-		# Configuring cartopy gridlines
-		gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0.3, color='black',  alpha=0.5)
-		gl.xlocator = mticker.FixedLocator([-180,-135,-90,-45,0,45,90,135,180])
-		gl.ylocator = mticker.FixedLocator([80, 60, 30, 0])
+		# Set position of subplot and some general settings for basemap
+		ax=plt.subplot(2,3,itimes+1)
+		m=Basemap(projection='npstere',boundinglat=area,lon_0=0,resolution='c')
+		lon2,lat2 = np.meshgrid(lons,lats)
+		x, y = m(lon2, lat2)
+		m.drawcoastlines(zorder=2)
+		m.drawparallels(np.arange(-80.,81.,20.),linewidth=0.3,dashes=[100,.0001])
+		m.drawmeridians(np.arange(-180.,181.,45.),linewidth=0.3,dashes=[100,.0001])
 
 		# Overflow colors
 		cmap_TR.set_over("darkred")
 		cmap_TR.set_under("deeppink")
+		
+		data_plot=(data_cat2-data_cat1)
 
 		# Plotting
-		s5=plt.contour(lons, lats, np.squeeze(data_cat3), levels=[0,0.025], linestyles='-' ,colors='black',transform=ccrs.PlateCarree() ,zorder=3)
-		s20=plt.contour(lons, lats, np.squeeze(data_cat3), levels=[0,0.1], linestyles='--' ,colors='black',transform=ccrs.PlateCarree() ,zorder=2)
-		im=plt.contourf(lons, lats, data_cat2-data_cat1*debug, levels=mapticks, cmap=cmap_TR, extend='both',transform=ccrs.PlateCarree(),zorder=1)
+		m.contour(x , y, np.squeeze(data_cat3), levels=[0,0.025], linestyles='-' ,colors='black',zorder=4)
+		im = m.contourf(x, y, data_plot, levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
 		
 		# Adding text labels
 		plt.text(0.50, 1.05, plot, horizontalalignment='center', fontsize=18, transform=ax.transAxes)
