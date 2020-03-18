@@ -5,6 +5,7 @@ Created on Fri Apr 26 13:12:45 100100
 
 @author: jstreffi-local
 
+
 Input arguments:
 	1 	Id of first experiment
 	2	Id of second experiment
@@ -17,20 +18,66 @@ Input arguments:
 	9	Name of colormap module
 	10	List of colorbar points
 """
-
+from __future__ import division
 import sys
+import random as rd
 import numpy as np
+import pandas as pd
+import bootstrapped.bootstrap as bs
+import bootstrapped.stats_functions as bs_stats
+from scipy import signal
 from scipy.io import netcdf
-from scipy import interpolate
-import scipy.stats as stats
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pylab import *
 from netCDF4 import Dataset
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-np.set_printoptions(threshold=sys.maxsize)
+from mpl_toolkits.basemap import Basemap
+import Ngl
+from tqdm import tqdm
+import dask
+from dask.delayed import delayed
+from dask.diagnostics import ProgressBar
+from ttictoc import TicToc
+t = TicToc() ## TicToc("name")
+
+def resample(xyobs,n,m):
+	xstar = []
+	ystar = []
+	for ni in range(n):
+		r = rd.randrange(0, xyobs.shape[0])
+		xstar.append(xyobs[r])
+	for mi in range(m):
+		r = rd.randrange(0, xyobs.shape[0])
+		ystar.append(xyobs[r])
+	xbarstar = np.mean(np.asarray(xstar),axis=0)
+	ybarstar = np.mean(np.asarray(ystar),axis=0)
+	t = xbarstar - ybarstar
+	return t
+
+def bootstrap(xyobs, data1, data2):
+	tstarobs = np.asarray(data2 - data1)
+	tstar = []
+	ta = []
+	pvalue = []
+	n = xyobs.shape[0]//2
+	m = xyobs.shape[0]//2
+	B = 10000
+
+	for bi in tqdm(range(B)):
+		t = dask.delayed(resample)(xyobs,n,m)
+		ta.append(t)
+	with ProgressBar():
+		tstar = dask.compute(ta)
+	tstar = np.squeeze(np.asarray(tstar), axis = 0)
+	pvalue = np.empty((tstarobs.shape[0],tstarobs.shape[1]))
+	for lat in tqdm(range(0,tstarobs.shape[0])):
+		for lon in range(0,tstarobs.shape[1]):
+			p1 = tstar[:,lat,lon][tstar[:,lat,lon] >= tstarobs[lat,lon]].shape[0]/B
+			p2 = tstar[:,lat,lon][tstar[:,lat,lon] >= -tstarobs[lat,lon]].shape[0]/B
+			pvalue[lat,lon] = min(p1,p2)
+  	return pvalue
+
 
 if __name__ == '__main__':
 	exp1=str(sys.argv[1])
@@ -51,142 +98,123 @@ if __name__ == '__main__':
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig = plt.figure(figsize=(12,10))
+	fig =  plt.figure(figsize=(9,6))
+	datadict1 = {}
+	datadict2 = {}
+	datadict3 = {}
+	datadict4 = {}
 
-	if str(sys.argv[9]) == "true":
-		print("hashing signifcant changes")
-
-
-	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
-		for res in reslist:
-			if res == 'T1279':
-				ensnumber = 60
-			else:
-				ensnumber = 100
-
-			datapath1=basepath+res+'/Experiment_'+exp1+'/ensemble_mean/'
-			datapath2=basepath+res+'/Experiment_'+exp2+'/ensemble_mean/'
-			datapath3=basepath+res+'/Experiment_'+exp1+'/'
-			datapath4=basepath+res+'/Experiment_'+exp2+'/'
-			res3a=[]
-			res4a=[]
-			data3=[]
-			data4=[]
-
-			# Reading netcdf files
-			ncfile1 = datapath1+paramname+'_ensmean_'+season+'.nc'
-			ncfile2 = datapath2+paramname+'_ensmean_'+season+'.nc'
+	for res in reslist:
+		if res == 'T1279':
+			ensnumber = 100
+		if res == 'T511':
+			ensnumber = 200
+		if res == 'T159':
+			ensnumber = 300
 
 
-			f = netcdf.netcdf_file(ncfile1, 'r')
-			data1  = np.copy(f.variables[param].data)
-			lats=np.copy(f.variables['lat'].data)
-			levs=np.copy(f.variables['plev'].data)
-			f.close()
+		datapath3=basepath+res+'/Experiment_'+exp1+'/'
+		datapath4=basepath+res+'/Experiment_'+exp2+'/'    
+		data3=[]
+		data4=[]
 
-			f = netcdf.netcdf_file(ncfile2, 'r')
-			data2  = np.copy(f.variables[param].data)
-			f.close()
+		for i in tqdm(range(ensnumber)):
+			ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+			ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
 
-			res1=np.zeros([data1.shape[1],data1.shape[2]])
-			res2=np.copy(res1)
-			resc=np.copy(res1)
-			x1=np.zeros(data1.shape[0])
-			x2=np.copy(x1)
+			data3.append(Dataset(ncfile3).variables[param][:])
+			data4.append(Dataset(ncfile4).variables[param][:])
+			data3[i] =  data3[i][0,:,:,:]
+			data4[i] =  data4[i][0,:,:,:]
 
-
-			for k in range(data1.shape[1]):
-				for i in range(data1.shape[2]):
-					for t in range(data1.shape[0]):
-						x1[t]=np.mean(data1[t,k,i,:])
-						x2[t]=np.mean(data2[t,k,i,:])
-					res1[k,i]=np.mean(x2)-np.mean(x1)
-					resc[k,i]=np.mean(x1)
-					if param == 'T':
-						resc[k,i]= resc[k,i]-273.15
-
-			res_old = [0]					
-			if str(sys.argv[9]) == "true":
-				for ens in range(ensnumber):
-					ncfile3 = datapath3+'E'+str(ens+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-					ncfile4 = datapath4+'E'+str(ens+1).zfill(3)+'/outdata/oifs/seasonal_mean/'+paramname+'_'+season+'.nc'
-
-
-					f = netcdf.netcdf_file(ncfile3, 'r')
-					data3 = np.copy(f.variables[param].data)
-					f.close()
-					print(ncfile3)
-
-					f = netcdf.netcdf_file(ncfile4, 'r')
-					data4= np.copy(f.variables[param].data)
-					f.close()
-
-					res3=np.zeros([data1.shape[1],data1.shape[2]])
-					res4=np.copy(res3)
-					x3=np.zeros(data1.shape[0])
-					x4=np.copy(x3)
-
-					for k in range(data1.shape[1]):
-						for i in range(data1.shape[2]):
-							for t in range(data1.shape[0]):
-								x3[t]=np.mean(data3[t,k,i,:])
-								x4[t]=np.mean(data4[t,k,i,:])
-                                        		res3[k,i]=np.mean(x3)
-                                        		res4[k,i]=np.mean(x4)
-                                        		if param == 'T':
-                                                		res3[k,i]= res3[k,i]-273.15
-                                                		res4[k,i]= res4[k,i]-273.15
-					res3a.append(res3)
-					res4a.append(res4)
-			
-
-			welch = stats.ttest_ind(res3a,res4a)
-			# Calculate where the standard deviation of dataset 1 is larger than the difference between 1 and 2
-			if str(sys.argv[9]) == "true":
-				data_sig = welch[1] < 0.1
-				# Where the absolute value of data2-data1 is smaller than the smalles maptick we don't want to plot significance
-				data_sig[abs(res1) < mapticks[(int(len(mapticks))/2)]] = False
-				print( mapticks[(int(len(mapticks))/2)])
-
-			ax=plt.subplot(4,len(reslist),itimes+1)
-
-			# Set axis labeling and sharing
-			plt.tick_params(labelsize=int(sys.argv[12]))
-			if itimes % 3 != 0:
-				plt.setp(ax.get_yticklabels(), visible=False)
-
-			if itimes < 9: 
-				plt.setp(ax.get_xticklabels(), visible=False)
-			
-			cmap_TR.set_over("darkred")
-			cmap_TR.set_under("deeppink")
-
-			# Plotting
-			im=plt.contourf(lats, levs/100, res1, levels=mapticks, cmap=cmap_TR, extend='both')
-			
-			plt.ylim([10,1000])
-			plt.gca().invert_yaxis()
-			plt.xlim([20,89])
-   
-			levels=np.arange(-80, 60, 4)
-			cs=plt.contour(lats, levs/100, resc, colors='k', levels=levels)
-			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
-
-			if str(sys.argv[9]) == "true":
-				wl=plt.contourf(lats, levs/100, data_sig, hatches=[' ','//'],cmap=cmap_TR, color='grey', extend='both', zorder=2, alpha=0)
-
+		data1 = np.mean(np.asarray(data3),axis=0)
+		data2 = np.mean(np.asarray(data4),axis=0)
 		
-                        # Increment plot counterdding text labels
-                        if ( itimes == 0 and res == 'T159' ):
-                                plt.text(.50, 1.05, 'TL159', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-                        if ( itimes == 1 and res == 'T511' ):
-                                plt.text(.50, 1.05, 'TL511', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-                        if ( itimes == 2 and res == 'T1279' ):
-                                plt.text(.50, 1.05, 'TL1279', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-                        if ( itimes % 3 == 0 ):
-                                plt.text(-0.25, .46, season, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
+		print(np.asarray(data1).shape)
+		print(np.asarray(data3).shape)
+		res1=np.mean(data1,axis=2)
+		res2=np.mean(data2,axis=2)
+		res3=np.mean(data3,axis=3)
+		res4=np.mean(data4,axis=3)
+		if param == 'T':
+			res1= res1-273.15
+			res2= res2-273.15
+			res3= res3-273.15
+			res4= res4-273.15
 
-                        itimes=itimes+1
+                lats = Dataset(ncfile3).variables[u'lat'][:]
+                levs = Dataset(ncfile3).variables[u'plev'][:]
+
+		datadict1[res] = res1 
+		datadict2[res] = res2
+		datadict3[res] = res3 
+		datadict4[res] = res4 	
+
+
+	for plot in [ 'T159', 'T511', 'T1279', 'T511-T159', 'T1279-T159', 'T1279-T511' ]:
+
+
+		if plot == 'T159' or plot == 'T511' or plot == 'T1279':
+			data1 = datadict1[plot]
+			data2 = datadict2[plot]
+			data3 = datadict3[plot]
+			data4 = datadict4[plot]
+		if plot == 'T511-T159':
+			data1 = datadict2['T159']-datadict1['T159']
+			data2 = datadict2['T511']-datadict1['T511']
+			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
+			data4 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
+		if plot == 'T1279-T159':
+			data1 = datadict2['T159']-datadict1['T159']
+			data2 = datadict2['T1279']-datadict1['T1279']
+			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
+			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
+		if plot == 'T1279-T511':
+			data1 = datadict2['T511']-datadict1['T511']
+			data2 = datadict2['T1279']-datadict1['T1279']
+			data3 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
+			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
+
+		# Calculating Bootstrap test
+		xyobs = np.asarray(np.concatenate([data3,data4]))
+		t.tic()
+		pvalue = bootstrap(xyobs, data1, data2)
+		t.toc()
+		print(t.elapsed)
+		data_sig = pvalue < 0.025
+
+
+		# Set axis labeling and sharing
+		ax=plt.subplot(2,3,itimes+1)
+		plt.tick_params(labelsize=int(sys.argv[12]))
+		if itimes % 3 != 0:
+			plt.setp(ax.get_yticklabels(), visible=False)
+
+		if itimes < 9: 
+			plt.setp(ax.get_xticklabels(), visible=False)
+	
+		cmap_TR.set_over("darkred")
+		cmap_TR.set_under("deeppink")
+
+		# Plotting
+		im=plt.contourf(lats, levs/100, data2-data1, levels=mapticks, cmap=cmap_TR, extend='both')
+	
+		plt.ylim([10,1000])
+		plt.gca().invert_yaxis()
+		plt.xlim([20,89])
+
+		levels=np.arange(-80, 60, 4)
+		cs=plt.contour(lats, levs/100, data1, colors='k', levels=levels)
+		plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
+
+		if str(sys.argv[9]) == "true":
+			wl=plt.contourf(lats, levs/100, data_sig, hatches=[' ','//'],cmap=cmap_TR, color='grey', extend='both', zorder=2, alpha=0)
+
+		# Adding text labels
+		plt.text(0.50, 1.05, plot, horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+
+		# Increment plot counter
+        	itimes=itimes+1
 
 fig.subplots_adjust(hspace=0.14, wspace = 0.1, left = 0.15, right = 0.88, top = 0.95, bottom = 0.1)
 cbar_ax = fig.add_axes([0.9, 0.16, 0.02, 0.67])

@@ -21,14 +21,23 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in pch #sin_diff T_for_doug U_for_doug #SynP sin_diff T U UP #iso_diff
+for todo in Z U T #force # SynP #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
 do
-
-        if [[ "$todo" == "pch" ]]; then
-                python polar_cap_height.py 11 16 T1279 Z Z $in 1 $out true -3.0,-2.6,-2.2,-1.8,-1.4,-1.0,-0.6,-0.2,0.2,0.6,1.0,1.4,1.8,2.2,2.6,3.0 colorbar_TR_70 14
+        if [[ "$todo" == "force" ]]; then
+                python forcing.py 11 16 T159,T511,T1279 SSR SSR $in 1 $out 
         fi
 
-	# t2m hPa zonal plots 
+        if [[ "$todo" == "pch" ]]; then
+                python polar_cap_height.py 11 16 T159,T511,T1279 Z Z $in 9.81 $out true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 14
+        fi
+
+	# Z zonal plots 
+	if [[ "$todo" == "Z" ]]; then
+		python zonal.py 11 16 T159,T511,T1279 Z Z $in 1 $out true  -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 14
+		#-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2
+	fi
+
+	# T zonal plots 
 	if [[ "$todo" == "T" ]]; then
 		python zonal.py 11 16 T159,T511,T1279 T T $in 1 $out true  -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 14
 		#-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2
@@ -45,7 +54,7 @@ do
         fi
 
         if [[ "$todo" == "SynP" ]]; then
-                python synprofile.py 11 16 T159,T511,T1279 Z Z $in 1 $out 14
+                python synprofile.py 11 16 T159,T511 Z Z $in 1 $out 14
         fi
  
        if [[ "$todo" == "iso_diff" ]]; then
