@@ -86,7 +86,7 @@ def read_file_squ(ensnumber,datapath1,paramname,param):
 def get_rmse(B,i,res,mean):
 	rmse = []
 	for b in range(B):
-		rmse.append(np.sqrt(((res[b,i] - mean) ** 2).mean()))
+		rmse.append(np.sqrt(((res[b,i] - mean) ** 2).mean())/np.mean(abs(mean)))
 	return np.mean(rmse,axis=0)
 
 
@@ -102,20 +102,26 @@ if __name__ == '__main__':
 	print("Resolutions:",reslist)
 	itimes=0
 	rmse_list = []
-	B=300
+	B=1000
 	for resolution in reslist:
 		if resolution == 'T1279':
-			ensnumber = 60
+			ensnumber = 100
 		elif resolution == 'T511':
-			ensnumber = 60
+			ensnumber = 100
 		elif resolution == 'T159':
-			ensnumber = 60
+			ensnumber = 100
 
 		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
-		
-		d = read_file_par(ensnumber,datapath1,paramname,param)
-		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
+		d1 = read_file_par(ensnumber,datapath1,paramname,param)
 
+		datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
+		d2 = read_file_par(ensnumber,datapath2,paramname,param)
+	
+		d = np.asarray(d1)-np.asarray(d2)
+
+		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
+		if len(np.squeeze(np.asarray(d)).shape) == 5:
+			d = np.squeeze(np.asarray(d))[:,:,4,:,:]
 # --- Resampling	
 		res = resample(B,np.squeeze(d))
 
@@ -129,14 +135,31 @@ if __name__ == '__main__':
                		rmse_final = dask.compute(rmse)
 		rmse_list.append(np.squeeze(np.asarray(rmse_final)))
 	
-	x = np.linspace(1,ensnumber,60)
+	x = np.linspace(1,ensnumber,ensnumber)
 	y = 1/sqrt(x)*np.mean(np.asarray(rmse_list),axis=0)[0]
 
-	fig = plt.figure(figsize=(5,2.5))
-	T159, = plt.plot(rmse_list[0], color='blue', label="TL159")
-	T511, = plt.plot(rmse_list[1], color='red', label="TL511")
-	T1279, = plt.plot(rmse_list[2], color='green', label="TL1279")
-	comp, = plt.plot(y, color='black', label="1/sqrt(n)")
+	fig = plt.figure(figsize=(6,7))
+	ax=plt.subplot(2,1,1)
+	T159, = plt.semilogx(rmse_list[0], color='blue', label="TL159")
+	T511, = plt.semilogx(rmse_list[1], color='red', label="TL511")
+	T1279, = plt.semilogx(rmse_list[2], color='green', label="TL1279")
+	comp, = plt.semilogx(y, color='black', label="1/sqrt(n)")
 	plt.legend(handles=[T159, T511, T1279, comp])
+
+	ax=plt.subplot(2,1,2)
+
+	ldh = rmse_list[2]/rmse_list[0]
+	mdh = rmse_list[2]/rmse_list[1]
+	s_lh = np.mean(np.asarray(ldh))
+	s_mh = np.mean(np.asarray(mdh))
+
+	T1279T159, = plt.plot(ldh, color='blue')
+	T1279T159mean = plt.axhline(s_lh, color='blue', lw=1,linestyle='--', label=np.around(s_lh,3))
+	T1279T511, = plt.plot(mdh, color='red')
+	T1279T511mean = plt.axhline(s_mh, color='red', lw=1,linestyle='--', label=np.around(s_mh,3))
+        T1279base = plt.axhline(1, color='green', lw=1,linestyle='--', label='1')
+
+        plt.legend(handles=[T1279base,T1279T511mean,T1279T159mean])
+
 	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=600)
 		

@@ -23,6 +23,9 @@ for todo in sim
 do
 
         if [[ "$todo" == "sim" ]]; then
+                python similarity_measure.py 11 16 T159,T511,T1279 T2M T2M $in 1 $out 
+                python similarity_measure.py 11 16 T159,T511,T1279 MSL MSL $in 1 $out 
                 python similarity_measure.py 11 16 T159,T511,T1279 Z Z $in 1 $out 
+                python similarity_measure.py 11 16 T159,T511,T1279 U U $in 1 $out 
 	fi
 done
