@@ -108,9 +108,9 @@ if __name__ == '__main__':
 		if res == 'T1279':
 			ensnumber = 100
 		if res == 'T511':
-			ensnumber = 200
+			ensnumber = 100
 		if res == 'T159':
-			ensnumber = 300
+			ensnumber = 100
 
 
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
