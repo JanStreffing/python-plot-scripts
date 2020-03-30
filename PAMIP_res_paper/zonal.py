@@ -98,7 +98,7 @@ if __name__ == '__main__':
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,6))
+	fig =  plt.figure(figsize=(9,4))
 	datadict1 = {}
 	datadict2 = {}
 	datadict3 = {}
@@ -108,9 +108,9 @@ if __name__ == '__main__':
 		if res == 'T1279':
 			ensnumber = 100
 		if res == 'T511':
-			ensnumber = 100
+			ensnumber = 200
 		if res == 'T159':
-			ensnumber = 100
+			ensnumber = 300
 
 
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
@@ -181,16 +181,15 @@ if __name__ == '__main__':
 		pvalue = bootstrap(xyobs, data1, data2)
 		t.toc()
 		print(t.elapsed)
-		data_sig = pvalue < 0.025
-
+		data_sig = np.ma.masked_greater(np.asarray(pvalue), 0.025)
 
 		# Set axis labeling and sharing
 		ax=plt.subplot(2,3,itimes+1)
-		plt.tick_params(labelsize=int(sys.argv[12]))
+		plt.tick_params(labelsize=12)
 		if itimes % 3 != 0:
 			plt.setp(ax.get_yticklabels(), visible=False)
 
-		if itimes < 9: 
+		if itimes < 3: 
 			plt.setp(ax.get_xticklabels(), visible=False)
 	
 		cmap_TR.set_over("darkred")
@@ -203,26 +202,40 @@ if __name__ == '__main__':
 		plt.gca().invert_yaxis()
 		plt.xlim([20,89])
 
-		levels=np.arange(-80, 60, 4)
-		cs=plt.contour(lats, levs/100, data1, colors='k', levels=levels)
-		plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
+
+		if plot == 'T159' or plot == 'T511' or plot == 'T1279':
+			if paramname == "T":
+				levels=np.arange(-80, 60, 10)
+			else:
+				levels=np.arange(-80, 60, 5)
+			cs=plt.contour(lats, levs/100, data1, colors='k', levels=levels,linewidths=0.7)
+
+			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
 
 		if str(sys.argv[9]) == "true":
-			wl=plt.contourf(lats, levs/100, data_sig, hatches=[' ','//'],cmap=cmap_TR, color='grey', extend='both', zorder=2, alpha=0)
+			wl=plt.pcolor(lats, levs/100, np.ma.asarray(data_sig), hatch='...', zorder=2, alpha=0)
 
 		# Adding text labels
-		plt.text(0.50, 1.05, plot, horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+		Alphabet = 'abcdefghijklmnopqrstuvwxyz'
+		plt.text(0.010, 1.05, Alphabet[itimes]+")", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
 
 		# Increment plot counter
         	itimes=itimes+1
 
-fig.subplots_adjust(hspace=0.14, wspace = 0.1, left = 0.15, right = 0.88, top = 0.95, bottom = 0.1)
-cbar_ax = fig.add_axes([0.9, 0.16, 0.02, 0.67])
-cbar_ax.tick_params(labelsize=18) 
-fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks)
+fig.subplots_adjust(hspace=0.25, wspace = 0.12, left = 0.1, right = 0.9, top = 0.945, bottom = 0.15)
+
+#for label in cbar_ax.xaxis.get_ticklabels()[::2]:
+#    label.set_visible(False)
+cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.794])
+cbar_ax.tick_params(labelsize=12) 
+
+colorbar_format = '% 1.1f'
+fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks,format=colorbar_format)
+
 degree_sign= u'\N{degree sign}'
-fig.text(0.02, 0.5, 'Pressure [hPa]', fontsize=20, va='center', rotation='vertical')
-fig.text(0.5, 0.04, 'Latitude ['+degree_sign+'N]', fontsize=20, ha='center')
+fig.text(0, 0.5, 'Pressure [hPa]', fontsize=16, va='center', rotation='vertical')
+fig.text(0.5, 0.01, 'Latitude ['+degree_sign+'N]', fontsize=16, ha='center')
+
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=900)
 
 
