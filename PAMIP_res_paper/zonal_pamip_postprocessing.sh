@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in  force # SynP #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
+for todo in T U # SynP #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
 do
         if [[ "$todo" == "force" ]]; then
                 python forcing.py 11 16 T159,T511,T1279 T2M T2M $in 1 $out 
@@ -29,7 +29,7 @@ do
         fi
 
         if [[ "$todo" == "pch" ]]; then
-                python polar_cap_height.py 11 16 T159,T511,T1279 Z Z $in 9.81 $out true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 14
+                python polar_cap_height.py 11 16 T159,T511,T1279 Z Z $in 9.81 $out true -3,-2.6,-2.2,-1.8,-1.4,-1,-0.6,-0.2,0.2,0.6,1,1.4,1.8,2.2,2.6,3 colorbar_TR_15 14
         fi
 
 	# Z zonal plots 

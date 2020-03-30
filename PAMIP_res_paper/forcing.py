@@ -75,7 +75,14 @@ def bootstrap(xyobs, data1, data2):
 			pvalue[lat,lon] = min(p1,p2)
   	return pvalue
 
-
+def align_yaxis(ax1, v1, ax2, v2):
+	"""adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+	_, y1 = ax1.transData.transform((0, v1))
+	_, y2 = ax2.transData.transform((0, v2))
+	inv = ax2.transData.inverted()
+	_, dy = inv.transform((0, 0)) - inv.transform((0, y1-y2))
+	miny, maxy = ax2.get_ylim()
+	ax2.set_ylim(miny+dy, maxy+dy)
 
 if __name__ == '__main__':
 	exp1=str(sys.argv[1])
@@ -96,7 +103,7 @@ if __name__ == '__main__':
 		if res == 'T511':
 			ensnumber = 100
 		if res == 'T159':
-			ensnumber = 100
+			ensnumber = 200
 		datapath1=basepath+res+'/Experiment_'+exp1+'/'
 		datapath2=basepath+res+'/Experiment_'+exp2+'/'    
 		data1=[]
@@ -122,36 +129,45 @@ if __name__ == '__main__':
 		data3m = Dataset(ncfile3).variables["sic"][:]
 		data4m = Dataset(ncfile4).variables["sic"][:]
 
-		# Calculating Bootstrap test
-		xyobs = np.asarray(np.concatenate([data1,data2]))
-		t.tic()
-		pvalue = bootstrap(xyobs, data1m, data2m)
-		t.toc()
-		print(t.elapsed)
+		if var == 'SSR':
+			data1m = data1m/21600
+			data2m = data2m/21600
 
 		# Plotting
 
-		N = 12
-		drange = pd.date_range("2000-06", periods=N, freq="MS")
+		drange = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
+	
 
 		if res == 'T159':
-			plotT159,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=3,color='Blue')
+			plotT159,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Blue', label="TL159")
 		if res == 'T511':
-			plotT511,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=3,color='Green')
+			plotT511,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Green', label="TL511")
 		if res == 'T1279':
-			plotT1279,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=3,color='Red')
+			plotT1279,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Red', label="TL1279")
 
+
+		degree_sign= u'\N{degree sign}'
 		if var == 'T2M':
-			ax.set_ylim(ymin=-0.5,ymax=5.5)
+			fig.text(0.05, 0.5, 'Temperature response [$K$]', fontsize=12, va='center', rotation=90)
+			ax.set_ylim(ymin=-3,ymax=6)
 		else:
-                        ax.set_ylim(ymin=150000,ymax=-400000)
+			fig.text(0.05, 0.5, 'Net surface heat flux response [$W/m^2$]', fontsize=12, va='center', rotation=90)
+                        ax.set_ylim(ymin=10,ymax=-20)
 
-
+		fig.text(0.952, 0.5, 'Sea ice concentration forcing [$frac$]', fontsize=12, va='center', rotation=90)
+		plt.xticks(rotation=30)
 		ax.set_xticks(drange)
 
 ax2=ax.twinx()
-plotSIC,=ax2.plot(drange,np.squeeze(data4m-data3m),linewidth=3,color='Black')
-ax2.set_ylim(ymin=-0.25,ymax=0.05)
+plt.axhline(0, color='grey', lw=0.5)
+plotSIC,=ax2.plot(drange,np.squeeze(data4m-data3m),linewidth=2.5,color='Black', label="SIC")
+ax2.set_ylim(ymin=0.25,ymax=-0.25)
+
+align_yaxis(ax, 0, ax2, 0)
+
+plt.legend(handles=[plotT1279,plotT511,plotT159,plotSIC])
+plt.subplots_adjust(left=0.15, bottom=0.15, right=0.85, top=None, wspace=None, hspace=None)
+
 fig.savefig(outpath+var+'_forcing.png', dpi=300)
 
 
