@@ -75,6 +75,14 @@ def read_file_par(ensnumber,datapath1,paramname,param):
                	d = dask.compute(data1)
 	return d
 
+def read_file_par2(ensnumber,datapath1,paramname,param):
+	data1 = []
+	for i in range(ensnumber):
+		ncfile1 = datapath1+'E'+str(i+101).zfill(3)+'/outdata/oifs/monthly_mean/'+paramname+'_monmean.nc'			
+		data1.append(dask.delayed(read_inner)(ncfile1, param))
+        with ProgressBar():
+               	d = dask.compute(data1)
+	return d
 
 def read_file_squ(ensnumber,datapath1,paramname,param):
 	d = []
@@ -106,36 +114,44 @@ if __name__ == '__main__':
 	for resolution in reslist:
 		if resolution == 'T1279':
 			ensnumber = 100
+			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
+			d1 = read_file_par(ensnumber,datapath1,paramname,param)
+			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
+			d2 = read_file_par(ensnumber,datapath2,paramname,param)
 		elif resolution == 'T511':
 			ensnumber = 100
+			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
+			d1 = read_file_par(ensnumber,datapath1,paramname,param)
+			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
+			d2 = read_file_par(ensnumber,datapath2,paramname,param)
 		elif resolution == 'T159':
 			ensnumber = 100
+			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
+			d1 = read_file_par(ensnumber,datapath1,paramname,param)
+			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
+			d2 = read_file_par(ensnumber,datapath2,paramname,param)
 
-		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
-		d1 = read_file_par(ensnumber,datapath1,paramname,param)
 
-		datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
-		d2 = read_file_par(ensnumber,datapath2,paramname,param)
 	
 		d = np.asarray(d1)-np.asarray(d2)
 
 		print("Input array shape (enssize,time,lev,lat,lon)",np.squeeze(np.asarray(d)).shape)
 		if len(np.squeeze(np.asarray(d)).shape) == 5:
-			d = np.squeeze(np.asarray(d))[:,:,4,:,:]
+			d = np.squeeze(np.asarray(d))[:,:,10,:,:]
 # --- Resampling	
 		res = resample(B,np.squeeze(d))
 
 # --- Calculating RMSE
 		mean = np.mean(np.squeeze(np.asarray(d)), axis=0)
 		rmse = []
-		for i in range(0,ensnumber):
+		for i in range(0,100):
 			rmse.append(get_rmse(B,i,res,mean))
 			#rmse.append(dask.delayed(get_rmse)(i,res,mean))
         	with ProgressBar():
                		rmse_final = dask.compute(rmse)
 		rmse_list.append(np.squeeze(np.asarray(rmse_final)))
 	
-	x = np.linspace(1,ensnumber,ensnumber)
+	x = np.linspace(1,100,100)
 	y = 1/sqrt(x)*np.mean(np.asarray(rmse_list),axis=0)[0]
 
 	fig = plt.figure(figsize=(6,7))
@@ -144,7 +160,17 @@ if __name__ == '__main__':
 	T511, = plt.semilogx(rmse_list[1], color='red', label="TL511")
 	T1279, = plt.semilogx(rmse_list[2], color='green', label="TL1279")
 	comp, = plt.semilogx(y, color='black', label="1/sqrt(n)")
+
 	plt.legend(handles=[T159, T511, T1279, comp])
+	if param == "T2M":
+		plt.text(0.010, 1.05, "a)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	        fig.text(0.03, 0.78, 'Specific RMSE', fontsize=16, va='center', rotation='vertical')
+	if param == "MSL":
+		plt.text(0.010, 1.05, "b)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	if param == "Z":
+		plt.text(0.010, 1.05, "c)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	if param == "U":
+		plt.text(0.010, 1.05, "d)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
 
 	ax=plt.subplot(2,1,2)
 
@@ -153,13 +179,27 @@ if __name__ == '__main__':
 	s_lh = np.mean(np.asarray(ldh))
 	s_mh = np.mean(np.asarray(mdh))
 
-	T1279T159, = plt.plot(ldh, color='blue')
+	T1279T159, = plt.semilogx(ldh, color='blue')
 	T1279T159mean = plt.axhline(s_lh, color='blue', lw=1,linestyle='--', label=np.around(s_lh,3))
-	T1279T511, = plt.plot(mdh, color='red')
+	T1279T511, = plt.semilogx(mdh, color='red')
 	T1279T511mean = plt.axhline(s_mh, color='red', lw=1,linestyle='--', label=np.around(s_mh,3))
         T1279base = plt.axhline(1, color='green', lw=1,linestyle='--', label='1')
+	ax.set_ylim(ymin=0.7,ymax=1.2)
 
         plt.legend(handles=[T1279base,T1279T511mean,T1279T159mean])
+	if param == "T2M":
+		plt.text(0.010, 1.05, "e)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	        fig.text(0.03, 0.32, 'Scaling factor vs. T1279', fontsize=16, va='center', rotation='vertical')
+	if param == "MSL":
+		plt.text(0.010, 1.05, "f)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	if param == "Z":
+		plt.text(0.010, 1.05, "g)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+	if param == "U":
+		plt.text(0.010, 1.05, "h)", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+
+	degree_sign= u'\N{degree sign}'
+	fig.text(0.5, 0.05, 'Bootstrap size', fontsize=16, ha='center')
+	fig.subplots_adjust(hspace=0.25, wspace = 0.12, left = 0.15, right = 0.9, top = 0.945, bottom = 0.15)
 
 	fig.savefig(outpath+paramname+'_rmse-evolution.png', dpi=600)
-		
+	
