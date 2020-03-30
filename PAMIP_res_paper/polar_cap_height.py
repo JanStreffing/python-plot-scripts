@@ -98,10 +98,10 @@ if __name__ == '__main__':
 			start = 60
 			end   = 100
 		if res == 'T511':
-			start = 100
+			start = 101
 			end   = 200
 		if res == 'T159':
-			start = 200
+			start = 101
 			end   = 300
 		datapath1=basepath+res+'/Experiment_'+exp1+'/polarch/'
 		datapath2=basepath+res+'/Experiment_'+exp2+'/polarch/'
@@ -151,4 +151,4 @@ if __name__ == '__main__':
 		#degree_sign= u'\N{degree sign}'
 		#fig.text(0.4, 0.02, 'Zonal wind speed [m/s]', fontsize=14, va='center')
 		#fig.text(0.058, 0.5, 'Latitude ['+degree_sign+'N]', fontsize=14, va='center', rotation='vertical')
-		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_'+res+'_diff.png', dpi=150)
+		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_'+res+'_diff.png', dpi=600)
