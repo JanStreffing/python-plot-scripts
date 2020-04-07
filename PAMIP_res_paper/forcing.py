@@ -92,10 +92,9 @@ if __name__ == '__main__':
 	outpath=str(sys.argv[8])
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,6))
 
 	print(reslist)
-	fig, ax = plt.subplots()
+	fig, ax = plt.subplots(figsize=(4.5,3))
 	for res in reslist:
 		print('reading files for',res)
 		if res == 'T1279':
@@ -120,8 +119,8 @@ if __name__ == '__main__':
 			data1.append(Dataset(ncfile1).variables[var][:])
 			data2.append(Dataset(ncfile2).variables[var][:])
 
-		ncfile3 = '/p/project/chhb19/jstreffi/input/amip-forcing/sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_pdSIC_gn_plot2.nc'
-		ncfile4 = '/p/project/chhb19/jstreffi/input/amip-forcing/sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_fuSIC_Arctic_gn_plot2.nc'
+		ncfile3 = '/p/project/chhb19/jstreffi/input/amip-forcing/sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_pdSIC_gn_plot3.nc'
+		ncfile4 = '/p/project/chhb19/jstreffi/input/amip-forcing/sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_fuSIC_Arctic_gn_plot3.nc'
 
 
 		data1m = np.mean(np.asarray(data1),axis=0)
@@ -139,36 +138,39 @@ if __name__ == '__main__':
 	
 
 		if res == 'T159':
-			plotT159,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Blue', label="TL159")
+			plotT159,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2,color='Blue', label="TL159")
 		if res == 'T511':
-			plotT511,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Green', label="TL511")
+			plotT511,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2,color='Green', label="TL511")
 		if res == 'T1279':
-			plotT1279,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2.5,color='Red', label="TL1279")
+			plotT1279,=ax.plot(drange,np.squeeze(data2m-data1m),linewidth=2,color='Red', label="TL1279")
 
 
 		degree_sign= u'\N{degree sign}'
 		if var == 'T2M':
-			fig.text(0.05, 0.5, 'Temperature response [$K$]', fontsize=12, va='center', rotation=90)
+			plt.text(0.02, 1.05, 'e)', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
+			fig.text(0.02, 0.5, 'Temperature response [$K$]', fontsize=10, va='center', rotation=90)
 			ax.set_ylim(ymin=-3,ymax=6)
 		else:
-			fig.text(0.05, 0.5, 'Net surface heat flux response [$W/m^2$]', fontsize=12, va='center', rotation=90)
+			plt.text(0.02, 1.05, 'd)', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
+			fig.text(0.01, 0.5, 'Net surface heat flux response [$W/m^2$]', fontsize=10, va='center', rotation=90)
                         ax.set_ylim(ymin=10,ymax=-20)
 
-		fig.text(0.952, 0.5, 'Sea ice concentration forcing [$frac$]', fontsize=12, va='center', rotation=90)
+		fig.text(0.95, 0.5, 'Sea ice extend reduction [$10^6 km$]', fontsize=10, va='center', rotation=90)
 		plt.xticks(rotation=30)
 		ax.set_xticks(drange)
+		ax.tick_params(labelsize=9)
 
 ax2=ax.twinx()
 plt.axhline(0, color='grey', lw=0.5)
-plotSIC,=ax2.plot(drange,np.squeeze(data4m-data3m),linewidth=2.5,color='Black', label="SIC")
-ax2.set_ylim(ymin=0.25,ymax=-0.25)
+plotSIC,=ax2.plot(drange,np.squeeze(data4m-data3m)/1000000000000,linewidth=2,color='Black', label="SIC")
+ax2.set_ylim(ymin=5,ymax=-5)
 
 align_yaxis(ax, 0, ax2, 0)
 
-plt.legend(handles=[plotT1279,plotT511,plotT159,plotSIC])
-plt.subplots_adjust(left=0.15, bottom=0.15, right=0.85, top=None, wspace=None, hspace=None)
+plt.legend(handles=[plotT1279,plotT511,plotT159,plotSIC],loc='lower center')
+plt.subplots_adjust(left=0.15, bottom=0.15, right=0.86, top=None, wspace=None, hspace=None)
 
-fig.savefig(outpath+var+'_forcing.png', dpi=300)
+fig.savefig(outpath+var+'_forcing.png', dpi=900)
 
 
 

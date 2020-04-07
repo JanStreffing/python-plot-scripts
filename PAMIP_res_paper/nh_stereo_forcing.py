@@ -56,94 +56,91 @@ if __name__ == '__main__':
 
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,9)) #10.6875))
+	fig =  plt.figure(figsize=(9,4)) #10.6875))
 
-	for season in [ 'SON', 'DJF', 'MAM', 'JJA' ]:
-		datapath1=basepath+'T159/Experiment_'+exp1+'/E001/post_20000401/'
-		datapath2=basepath+'T159/Experiment_'+exp2+'/E001/post_20000401/'
+	datapath1='/p/project/chhb19/jstreffi/input/amip-forcing/'
+	datapath2='/p/project/chhb19/jstreffi/input/amip-forcing/'
 
-		# Reading netcdf files
-		ncfile1 = datapath1+'sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_pdSIC_gn_'+season+'.nc'
-		ncfile2 = datapath2+'sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_fuSIC_Arctic_gn_'+season+'.nc'
-		dataset1 = Dataset(ncfile1) 
-		dataset2 = Dataset(ncfile2) 
-		print ncfile1
-		print ncfile2
-					
-		# Loading data from datasets
-		data1 = dataset1.variables[param][:]
-		data2 = dataset2.variables[param][:]
-
-
-		data1[data1==0]=np.nan
-	        #data1[data1>1]=np.nan
-		data2[data2==0]=np.nan
-	        #data2[data2>1]=np.nan
-
-		print(np.squeeze(data1).shape)
-		print(len(np.squeeze(data1).shape))
-
-		# Split data and concatenate in reverse order to turn by 180° to Prime meridian
-		ds1,ds2 = np.hsplit(np.squeeze(data1),2)
-		data_cat1 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
-		ds1,ds2 = np.hsplit(np.squeeze(data2),2)
-		data_cat2 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
-
-		# Loading coords, turning longitude coordiante by 180° to Prime meridian
-		lons = dataset1.variables[u'lon'][:]-180
-		lats = dataset1.variables[u'lat'][:]
-
-		# add cyclic point to data array and longitude
-		data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
-		data_cat2 = Ngl.add_cyclic(data_cat2)	
-
-		for plot in [ 'PD', 'FU', 'FU-PD' ]:
-
-			print itimes
-			# Set position of subplot and some general settings for cartopy
-			ax=plt.subplot(4,3,itimes+1,projection=ccrs.NorthPolarStereo())
-			ax.set_extent([-180, 180, 50, 50], ccrs.PlateCarree())
-			ax.add_feature(cfeature.COASTLINE,zorder=3)
-    			ax.add_feature(cfeature.LAND, zorder=2, facecolor='lightgrey')
-
-			# Configuring cartopy gridlines
-			gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0.3, color='black',  alpha=0.5)
-			gl.xlocator = mticker.FixedLocator([-180,-135,-90,-45,0,45,90,135,180])
-			gl.ylocator = mticker.FixedLocator([80, 60, 30, 0])
+	# Reading netcdf files
+	ncfile1 = datapath1+'sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_pdSIC_gn_dec.nc'
+	ncfile2 = datapath2+'sic_input4MIPs_SSTsAndSeaIce_PAMIP_pdSST_fuSIC_Arctic_gn_dec.nc'
+	dataset1 = Dataset(ncfile1) 
+	dataset2 = Dataset(ncfile2) 
+	print ncfile1
+	print ncfile2
+				
+	# Loading data from datasets
+	data1 = dataset1.variables[param][:]
+	data2 = dataset2.variables[param][:]
 
 
-			# Plotting
-			if ( plot == 'PD' ):
-				im_abs=plt.contourf(lons, lats, data_cat1, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
-			if ( plot == 'FU' ):
-				im_abs=plt.contourf(lons, lats, data_cat2, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
-			if ( plot == 'FU-PD' ):
-				im_diff=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks_diff, cmap=cmap_red.reversed(), extend='both',transform=ccrs.PlateCarree(),zorder=1)
+	data1[data1==0]=np.nan
+	#data1[data1>1]=np.nan
+	data2[data2==0]=np.nan
+	#data2[data2>1]=np.nan
 
-			# Adding text labels
-			if ( itimes == 0 ):
-				plt.text(0.50, 1.05, 'Present Day', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-			if ( itimes == 1 ):
-				plt.text(0.50, 1.05, 'Future', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-			if ( itimes == 2 ):
-				plt.text(0.50, 1.05, 'Future - Present Day', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
-			if ( itimes % 3 == 0 ):
-				plt.text(-0.05, .50, season, horizontalalignment='right', fontsize=18, transform=ax.transAxes)
+	print(np.squeeze(data1).shape)
+	print(len(np.squeeze(data1).shape))
+
+	# Split data and concatenate in reverse order to turn by 180° to Prime meridian
+	ds1,ds2 = np.hsplit(np.squeeze(data1),2)
+	data_cat1 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
+	ds1,ds2 = np.hsplit(np.squeeze(data2),2)
+	data_cat2 = np.concatenate((ds2,ds1),axis=1)/float(sys.argv[7])
+
+	# Loading coords, turning longitude coordiante by 180° to Prime meridian
+	lons = dataset1.variables[u'lon'][:]-180
+	lats = dataset1.variables[u'lat'][:]
+
+	# add cyclic point to data array and longitude
+	data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
+	data_cat2 = Ngl.add_cyclic(data_cat2)	
+
+	for plot in [ 'PD', 'FU', 'FU-PD' ]:
+
+		print itimes
+		# Set position of subplot and some general settings for cartopy
+		ax=plt.subplot(1,3,itimes+1,projection=ccrs.NorthPolarStereo())
+		ax.set_extent([-180, 180, 50, 50], ccrs.PlateCarree())
+		ax.add_feature(cfeature.COASTLINE,zorder=3)
+		ax.add_feature(cfeature.LAND, zorder=2, facecolor='lightgrey')
+
+		# Configuring cartopy gridlines
+		gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0.3, color='black',  alpha=0.5)
+		gl.xlocator = mticker.FixedLocator([-180,-135,-90,-45,0,45,90,135,180])
+		gl.ylocator = mticker.FixedLocator([80, 60, 30, 0])
+
+
+		# Plotting
+		if ( plot == 'PD' ):
+			im_abs=plt.contourf(lons, lats, data_cat1, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
+		if ( plot == 'FU' ):
+			im_abs=plt.contourf(lons, lats, data_cat2, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
+		if ( plot == 'FU-PD' ):
+			im_diff=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks_diff, cmap=cmap_red.reversed(), extend='both',transform=ccrs.PlateCarree(),zorder=1)
+
+		# Adding text labels
+		if ( itimes == 0 ):
+			plt.text(0.05, 1.05, 'a)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+		if ( itimes == 1 ):
+			plt.text(0.05, 1.05, 'b)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+		if ( itimes == 2 ):
+			plt.text(0.05, 1.05, 'c)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
 
 
 
-			# Increment plot counter
-			itimes=itimes+1
+		# Increment plot counter
+		itimes=itimes+1
 
-fig.subplots_adjust(hspace=0, wspace = 0.1, left = 0.08, right = 0.73, top = 0.95, bottom = 0.05)
+fig.subplots_adjust(hspace=0, wspace = 0.1, left = 0.05, right = 0.95, top = 1, bottom = 0.2)
 
-cbar_ax_abs = fig.add_axes([0.76, 0.16, 0.03, 0.67])
+cbar_ax_abs = fig.add_axes([0.15, 0.21, 0.7, 0.03])
 cbar_ax_abs.tick_params(labelsize=int(sys.argv[12])) 
-fig.colorbar(im_abs, cax=cbar_ax_abs, orientation='vertical', extend='both',ticks=mapticks_abs)
+fig.colorbar(im_abs, cax=cbar_ax_abs, orientation='horizontal', extend='both',ticks=mapticks_abs)
 
-cbar_ax_diff = fig.add_axes([0.86, 0.16, 0.03, 0.67])
+cbar_ax_diff = fig.add_axes([0.15, 0.075, 0.7, 0.03])
 cbar_ax_diff.tick_params(labelsize=int(sys.argv[12])) 
-fig.colorbar(im_diff, cax=cbar_ax_diff, orientation='vertical', extend='both',ticks=mapticks_diff)
+fig.colorbar(im_diff, cax=cbar_ax_diff, orientation='horizontal', extend='both',ticks=mapticks_diff)
 
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=900)
 
