@@ -79,6 +79,41 @@ def bootstrap(xyobs, data1, data2):
 			pvalue[lat,lon] = min(p1,p2)
 	return pvalue
 
+def read_inner(ncfile1, param):
+	data1 = Dataset(ncfile1).variables[param][:]
+	return data1
+
+
+def read_file_par(ensnumber,datapath1,paramname,param,start):
+	data1 = []
+	for i in range(ensnumber):
+		ncfile1 = datapath1+'E'+str(i+start).zfill(3)+'/outdata/oifs/extreme/HR_'+paramname+'_'+area+'.nc'
+		data1.append(dask.delayed(read_inner)(ncfile1, param))
+        with ProgressBar():
+               	d = dask.compute(data1)
+	return d
+
+
+def percentile(data1, data2, ensnumber, param, day):
+	gt1=[]
+	gt2=[]
+	i1 = day
+	i2 = day+30	
+	if param == 'T2M':
+		percentile = np.percentile(data1[:,i1:i2,:,:],5)
+		for i in range(ensnumber):
+			gt1.append(np.less(data1[i,i1+15,:,:],percentile))
+			gt2.append(np.less(data2[i,i1+15,:,:],percentile))
+	else:
+		percentile = np.percentile(data1[:,i1:i2,:,:],95)
+		for i in range(ensnumber):
+			gt1.append(np.greater(data1[i,i1+15,:,:],percentile))
+			gt2.append(np.greater(data2[i,i1+15,:,:],percentile))
+	vald1.append(np.sum(np.asarray(gt1))/np.size(data1))
+	vald2.append(np.sum(np.asarray(gt2))/np.size(data2))
+	vald3.append(np.sum(np.asarray(gt2))/np.size(data2)+np.sum(np.asarray(gt1))/np.size(data1))
+	return(vald1, vald2, vald3)
+
 
 
 if __name__ == '__main__':
@@ -98,7 +133,7 @@ if __name__ == '__main__':
 	val2 = []
 	val3 = []
 
-	for area in [ 'NH', 'EA', 'NA' ]:
+	for area in [ 'NP', 'EA', 'NA' ]:
 		for res in reslist:
 			print('reading files for',res)
 			if res == 'T1279':
@@ -113,64 +148,39 @@ if __name__ == '__main__':
 			ensnumber = end-start
 			datapath1=basepath+res+'/Experiment_'+exp1+'/'
 			datapath2=basepath+res+'/Experiment_'+exp2+'/'    
-			data1=[]
-			data2=[]
-			for i in tqdm(range(ensnumber)):
 
-				ncfile1 = datapath1+'E'+str(i+start).zfill(3)+'/outdata/oifs/extreme/HR_'+paramname+'_'+area+'.nc'
-				ncfile2 = datapath2+'E'+str(i+start).zfill(3)+'/outdata/oifs/extreme/HR_'+paramname+'_'+area+'.nc'
+			data1 = read_file_par(ensnumber,datapath1,paramname,param,start)
+			data2 = read_file_par(ensnumber,datapath2,paramname,param,start)
 
-				data1.append(Dataset(ncfile1).variables[param][:])
-				data2.append(Dataset(ncfile2).variables[param][:])
+			data1 = np.squeeze(data1)
+			data2 = np.squeeze(data2)
 
-			data1 = np.asarray(data1)
-			data2 = np.asarray(data2)
+			vald1 = []		
+			vald2 = []		
+			vald3 = []		
 
-			gt1=[]
-			gt2=[]
-			for month in [ 'Dec', 'Jan', 'Feb', 'Mar' ]:
-				if month == 'Dec':
-					i1 = 0 
-					i2 = 30
-					
-				if month == 'Jan':
-					i1 = 31 
-					i2 = 61
-				if month == 'Dec':
-					i1 = 62 
-					i2 = 90
-				if month == 'Dec':
-					i1 = 91 
-					i2 = 121
-				
-				if param == 'T2M':
-					percentile = np.percentile(np.concatenate([data1[:,i1:i2,:,:],data2[:,i1:i2,:,:]]),5,axis=0)
-					for i in range(ensnumber):
-						gt1.append(np.less(data1[i,i1:i2,:,:],percentile))
-						gt2.append(np.less(data2[i,i1:i2,:,:],percentile))
-				else:
-					percentile = np.percentile(np.concatenate([data1[:,i1:i2,:,:],data2[:,i1:i2,:,:]]),95,axis=0)
-                                        for i in range(ensnumber):
-                                                gt1.append(np.greater(data1[i,i1:i2,:,:],percentile))
-                                                gt2.append(np.greater(data2[i,i1:i2,:,:],percentile))
+			for day in tqdm(range(np.shape(data1)[1]-31)):
+				vald = dask.delayed(percentile)(data1, data2, ensnumber, param, day)
+			with ProgressBar():
+				val = dask.compute(vald)
+			val1.append(val[0][0])			
+			val2.append(val[0][1])			
+			val3.append(val[0][2])			
+	val1 = np.squeeze(val1)
+	val2 = np.squeeze(val2)
+	val3 = np.squeeze(val3)
 
-			val1.append(np.sum(np.asarray(gt1))/np.size(data1))
-			val2.append(np.sum(np.asarray(gt2))/np.size(data2))
-			val3.append(np.sum(np.asarray(gt2))/np.size(data2)+np.sum(np.asarray(gt1))/np.size(data1))
-
-			print('Ctrl days',np.sum(np.asarray(gt1))/np.size(data1))
-			print('Lowice day',np.sum(np.asarray(gt2))/np.size(data2))
-			print('sum',np.sum(np.asarray(gt2))/np.size(data2)+np.sum(np.asarray(gt1))/np.size(data1))
 	if param == 'T2M':
 		plt.ylabel('Cold spell [%]',fontsize=14)
 	else:
 		plt.ylabel('Heavy precipitation [%]',fontsize=14)
 
-	plt.xlabel(' Northern Hemisphere               Eurasia                North America           ',fontsize=14)
+	plt.xlabel('                  Arctic                           Eurasia                       North America           ',fontsize=14)
 	barWidth = 0.3
 	r1 = np.arange(len(val1))
 	r2 = [x + barWidth for x in r1]
 	leng= len(val1)
+	
 	val1=np.asarray(val1)*100/np.asarray(val3)
 	val2=np.asarray(val2)*100/np.asarray(val3)
 
