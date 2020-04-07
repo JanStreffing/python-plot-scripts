@@ -22,7 +22,7 @@ out_mistral="/mnt/lustre01/work/ba1035/a270092/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M #MSL z500 forcing #haus U SD forcing synact
+for todo in forcing #T2M #MSL z500 forcing #haus U SD forcing synact
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "z500" ]]; then

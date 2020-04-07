@@ -8,12 +8,12 @@ from matplotlib.pylab import *
 datapath='/p/largedata/hhb19/jstreffi/runtime/oifsamip/APPLICATE/'
 modelfactor=1
 
-textfile11T159=datapath+'sinuosity_Experiment_11T159_AT.txt'
-textfile11T511=datapath+'sinuosity_Experiment_11T159_AT.txt'
-textfile11T1279=datapath+'sinuosity_Experiment_11T511_AT.txt'
-textfile16T159=datapath+'sinuosity_Experiment_16T511_AT.txt'
-textfile16T511=datapath+'sinuosity_Experiment_16T1279_AT.txt'
-textfile16T1279=datapath+'sinuosity_Experiment_16T1279_AT.txt'
+textfile11T159=datapath+'sinuosity_Experiment_11T159_AS.txt'
+textfile11T511=datapath+'sinuosity_Experiment_11T159_AS.txt'
+textfile11T1279=datapath+'sinuosity_Experiment_11T511_AS.txt'
+textfile16T159=datapath+'sinuosity_Experiment_16T511_AS.txt'
+textfile16T511=datapath+'sinuosity_Experiment_16T1279_AS.txt'
+textfile16T1279=datapath+'sinuosity_Experiment_16T1279_AS.txt'
 
 sinuosity11T159=np.zeros(12)
 sinuosity11T511=np.zeros(12)
@@ -136,7 +136,7 @@ plt.xlabel("Month")
 
 plt.legend([plot159,plot511,plot1279],["TL159","TL511","T1279"],loc=1,prop={'size':10})
 
-fig.savefig(datapath+'sinuosity_diff_NA.png',dpi=300)
+fig.savefig(datapath+'sinuosity_diff_AS.png',dpi=300)
 
 plt.show()
 

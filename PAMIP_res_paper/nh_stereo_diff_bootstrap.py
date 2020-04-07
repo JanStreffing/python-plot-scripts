@@ -238,12 +238,12 @@ if __name__ == '__main__':
 		cmap_TR.set_under("deeppink")
 		
 		data_plot=(data_cat2-data_cat1)
-		data4 = np.ma.masked_greater(np.asarray(pvalue), 0.025)
+		data_sig = np.ma.masked_greater(np.asarray(data_cat3), 0.025)
 		
 
 		# Plotting
 
-		plt.pcolor(lats, levs/100, np.ma.asarray(data_sig), hatch='....', zorder=4, alpha=0)
+		plt.pcolor(x, y, np.ma.asarray(data_sig), hatch='....', zorder=4, alpha=0)
 		#m.contour(x , y, np.squeeze(data_cat3), levels=[0,0.025], linestyles='-' ,colors='black',zorder=4)
 		im = m.contourf(x, y, data_plot, levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
 		
