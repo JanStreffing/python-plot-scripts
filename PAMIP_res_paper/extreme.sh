@@ -19,7 +19,7 @@ out="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M
+for todo in PRECIP #T2M
 do
         if [[ "$todo" == "PRECIP" ]]; then
                 python extreme.py 11 16 T159,T511,T1279 PRECIP PRECIP $in 1 $out 

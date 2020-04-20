@@ -98,10 +98,10 @@ if __name__ == '__main__':
 			start = 60
 			end   = 100
 		if res == 'T511':
-			start = 101
+			start = 100
 			end   = 200
 		if res == 'T159':
-			start = 101
+			start = 100
 			end   = 300
 		datapath1=basepath+res+'/Experiment_'+exp1+'/polarch/'
 		datapath2=basepath+res+'/Experiment_'+exp2+'/polarch/'
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 		pvalue = bootstrap(xyobs, mean1, mean2)
 
 # --- Preparation for plots
-		fig, ax = plt.subplots(figsize=(10,6))
+		fig, ax = plt.subplots(figsize=(8,3))
 		cmap_TR.set_over("darkred")
 		cmap_TR.set_under("deeppink")
 		mean1 = np.transpose(mean1)
@@ -143,12 +143,5 @@ if __name__ == '__main__':
 		cbar = fig.colorbar(im)
 
 		ax.xaxis.set_tick_params(rotation=30)
-		#plt.xticks(np.arange(-10, 10.1, step=2.5))
-		#plt.axvline(0, color='black', lw=1)
-		#plt.legend(loc='lower right')
-		#plt.xlabel('Zonal Wind speed')
-
-		#degree_sign= u'\N{degree sign}'
-		#fig.text(0.4, 0.02, 'Zonal wind speed [m/s]', fontsize=14, va='center')
-		#fig.text(0.058, 0.5, 'Latitude ['+degree_sign+'N]', fontsize=14, va='center', rotation='vertical')
-		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_'+res+'_diff.png', dpi=600)
+		fig.subplots_adjust(bottom = 0.18)
+		fig.savefig(outpath+'pch_'+exp2+'_'+exp1+'_'+res+'_diff.png', dpi=900)
