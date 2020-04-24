@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,4)) #10.6875))
+	fig =  plt.figure(figsize=(9,6)) #10.6875))
 
 	datapath1='/p/project/chhb19/jstreffi/input/amip-forcing/'
 	datapath2='/p/project/chhb19/jstreffi/input/amip-forcing/'
@@ -96,11 +96,11 @@ if __name__ == '__main__':
 	data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
 	data_cat2 = Ngl.add_cyclic(data_cat2)	
 
-	for plot in [ 'PD', 'FU', 'FU-PD' ]:
+	for plot in [ 'PD', 'FU' ]:#, 'FU-PD' ]:
 
 		print itimes
 		# Set position of subplot and some general settings for cartopy
-		ax=plt.subplot(1,3,itimes+1,projection=ccrs.NorthPolarStereo())
+		ax=plt.subplot(1,2,itimes+1,projection=ccrs.NorthPolarStereo())
 		ax.set_extent([-180, 180, 50, 50], ccrs.PlateCarree())
 		ax.add_feature(cfeature.COASTLINE,zorder=3)
 		ax.add_feature(cfeature.LAND, zorder=2, facecolor='lightgrey')
@@ -113,34 +113,36 @@ if __name__ == '__main__':
 
 		# Plotting
 		if ( plot == 'PD' ):
-			im_abs=plt.contourf(lons, lats, data_cat1, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			im_abs=plt.contourf(lons, lats, data_cat1*100, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
 		if ( plot == 'FU' ):
-			im_abs=plt.contourf(lons, lats, data_cat2, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
+			im_abs=plt.contourf(lons, lats, data_cat2*100, levels=mapticks_abs, cmap='cmo.ice', extend='both',transform=ccrs.PlateCarree(),zorder=1)
 		if ( plot == 'FU-PD' ):
 			im_diff=plt.contourf(lons, lats, data_cat2-data_cat1, levels=mapticks_diff, cmap=cmap_red.reversed(), extend='both',transform=ccrs.PlateCarree(),zorder=1)
 
 		# Adding text labels
 		if ( itimes == 0 ):
-			plt.text(0.05, 1.05, 'a)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+			plt.text(0.1, 1.05, 'a)  Present SIC', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
 		if ( itimes == 1 ):
-			plt.text(0.05, 1.05, 'b)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+			plt.text(0.1, 1.05, 'b)  Future SIC', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
 		if ( itimes == 2 ):
-			plt.text(0.05, 1.05, 'c)', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+			plt.text(0.1, 1.05, 'c)  FU-PD SIC', horizontalalignment='center', fontsize=18, transform=ax.transAxes)
 
 
 
 		# Increment plot counter
 		itimes=itimes+1
 
-fig.subplots_adjust(hspace=0, wspace = 0.1, left = 0.05, right = 0.95, top = 1, bottom = 0.2)
+fig.subplots_adjust(hspace=0, wspace = 0.4, left = 0.05, right = 0.95, top = 0.85, bottom = 0.20)
 
-cbar_ax_abs = fig.add_axes([0.15, 0.21, 0.7, 0.03])
-cbar_ax_abs.tick_params(labelsize=int(sys.argv[12])) 
-fig.colorbar(im_abs, cax=cbar_ax_abs, orientation='horizontal', extend='both',ticks=mapticks_abs)
+cbar_ax_abs = fig.add_axes([0.15, 0.15, 0.7, 0.03])
+cbar_ax_abs.tick_params(labelsize=12) 
+cb = fig.colorbar(im_abs, cax=cbar_ax_abs, orientation='horizontal', extend='both',ticks=mapticks_abs)
+cb.set_label(label="Sea Ice Concentration [%]", size='14')
+cb.ax.tick_params(labelsize='12')
 
-cbar_ax_diff = fig.add_axes([0.15, 0.075, 0.7, 0.03])
-cbar_ax_diff.tick_params(labelsize=int(sys.argv[12])) 
-fig.colorbar(im_diff, cax=cbar_ax_diff, orientation='horizontal', extend='both',ticks=mapticks_diff)
+#cbar_ax_diff = fig.add_axes([0.15, 0.075, 0.7, 0.03])
+#cbar_ax_diff.tick_params(labelsize=int(sys.argv[12])) 
+#fig.colorbar(im_diff, cax=cbar_ax_diff, orientation='horizontal', extend='both',ticks=mapticks_diff)
 
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=900)
 

@@ -38,6 +38,7 @@ import dask
 from dask.delayed import delayed
 from dask.diagnostics import ProgressBar
 from ttictoc import TicToc
+import string
 t = TicToc() ## TicToc("name")
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -63,7 +64,7 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = []
 	n = xyobs.shape[0]//2
 	m = xyobs.shape[0]//2
-	B = 10000
+	B = 20000
 
 	for bi in tqdm(range(B)):
 		t = dask.delayed(resample)(xyobs,n,m)
@@ -114,7 +115,7 @@ if __name__ == '__main__':
 	datadict3 = {}
 	datadict4 = {}
 
-	print(reslist)
+	#print(reslist)
 	for res in reslist:
 		print('reading files for',res)
 		if res == 'T1279':
@@ -243,22 +244,30 @@ if __name__ == '__main__':
 
 		# Plotting
 
-		plt.pcolor(x, y, np.ma.asarray(data_sig), hatch='....', zorder=4, alpha=0)
+		plt.pcolor(x, y, np.ma.asarray(data_sig), hatch='...', zorder=4, alpha=0,linewidth=.05)
 		#m.contour(x , y, np.squeeze(data_cat3), levels=[0,0.025], linestyles='-' ,colors='black',zorder=4)
 		im = m.contourf(x, y, data_plot, levels=mapticks, cmap=cmap_TR, extend='both',zorder=1)
 		
 		# Adding text labels
-		plt.text(0.50, 1.05, plot, horizontalalignment='center', fontsize=18, transform=ax.transAxes)
+		plt.text(0., 1.05, string.ascii_lowercase[itimes]+')  '+plot, fontsize=16, transform=ax.transAxes)
 
 		# Increment plot counter
 		itimes=itimes+1
 
-fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.85, top = 0.95, bottom = 0.05)
-cbar_ax = fig.add_axes([0.88, 0.16, 0.023, 0.67])
+if paramname == 'T2M':
+	fig.text(0.94, 0.5, 'Temperature anomaly [$K$]', fontsize=16, va='center', rotation=90)
+if paramname == 'Z':
+	fig.text(0.955, 0.5, '500 hPa geopotential height anomaly [$m$]', fontsize=16, va='center', rotation=90)
+if paramname == 'MSL':
+	fig.text(0.97, 0.5, 'Mean surface level pressure anomaly [$Pa$]', fontsize=16, va='center', rotation=90)
+
+fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0, right = 0.8, top = 1, bottom = 0)
+#fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.75, top = 0.95, bottom = 0.05)
+cbar_ax = fig.add_axes([0.835, 0.16, 0.023, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 colorbar_format = '% 1.1f'
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks,format=colorbar_format)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=300)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=600)
 
 
 

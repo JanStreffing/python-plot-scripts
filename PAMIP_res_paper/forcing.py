@@ -147,15 +147,15 @@ if __name__ == '__main__':
 
 		degree_sign= u'\N{degree sign}'
 		if var == 'T2M':
-			plt.text(0.02, 1.05, 'e)', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
+			plt.text(0.38, 1.08, 'd)  2m air temperature', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
 			fig.text(0.02, 0.5, 'Temperature response [$K$]', fontsize=10, va='center', rotation=90)
 			ax.set_ylim(ymin=-3,ymax=6)
 		else:
-			plt.text(0.02, 1.05, 'd)', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
+			plt.text(0.26, 1.08, 'c)  Net heat flux', horizontalalignment='center', fontsize=16, transform=ax.transAxes)
 			fig.text(0.01, 0.5, 'Net surface heat flux response [$W/m^2$]', fontsize=10, va='center', rotation=90)
                         ax.set_ylim(ymin=10,ymax=-20)
 
-		fig.text(0.95, 0.5, 'Sea ice extend reduction [$10^6 km$]', fontsize=10, va='center', rotation=90)
+		fig.text(0.95, 0.5, 'Sea ice extend reduction [$10^6 km^2$]', fontsize=10, va='center', rotation=90)
 		plt.xticks(rotation=30)
 		ax.set_xticks(drange)
 		ax.tick_params(labelsize=9)

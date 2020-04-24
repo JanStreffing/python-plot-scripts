@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in T2M #MSL Z T2M #haus U SD forcing synact
+for todo in T2M MSL Z #haus U SD forcing synact
 do
 	# z500 hPa polar plots 
 	if [[ "$todo" == "Z" ]]; then
@@ -82,7 +82,8 @@ do
 	fi
 
         if [[ "$todo" == "forcing" ]]; then
-                python nh_stereo_forcing.py 11 16 dummy sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1
+                #python nh_stereo_forcing.py 11 16 dummy sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1
+                python nh_stereo_forcing.py 11 16 dummy sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,10,20,30,40,50,60,70,80,90,100
         fi
 
 

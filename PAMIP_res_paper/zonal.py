@@ -39,6 +39,7 @@ import dask
 from dask.delayed import delayed
 from dask.diagnostics import ProgressBar
 from ttictoc import TicToc
+import string
 t = TicToc() ## TicToc("name")
 
 def resample(xyobs,n,m):
@@ -62,7 +63,7 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = []
 	n = xyobs.shape[0]//2
 	m = xyobs.shape[0]//2
-	B = 10000
+	B = 20000
 
 	for bi in tqdm(range(B)):
 		t = dask.delayed(resample)(xyobs,n,m)
@@ -98,7 +99,7 @@ if __name__ == '__main__':
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,4))
+	fig =  plt.figure(figsize=(9,5.5))
 	datadict1 = {}
 	datadict2 = {}
 	datadict3 = {}
@@ -108,9 +109,9 @@ if __name__ == '__main__':
 		if res == 'T1279':
 			ensnumber = 100
 		if res == 'T511':
-			ensnumber = 200
+			ensnumber = 100
 		if res == 'T159':
-			ensnumber = 300
+			ensnumber = 200
 
 
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
@@ -213,28 +214,32 @@ if __name__ == '__main__':
 			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
 
 		if str(sys.argv[9]) == "true":
-			wl=plt.pcolor(lats, levs/100, np.ma.asarray(data_sig), hatch='...', zorder=2, alpha=0)
+			wl=plt.pcolor(lats, levs/100, np.ma.asarray(data_sig), hatch='..', zorder=2, alpha=0, linewidth=0.5)
 
 		# Adding text labels
-		Alphabet = 'abcdefghijklmnopqrstuvwxyz'
-		plt.text(0.010, 1.05, Alphabet[itimes]+")", horizontalalignment='left', fontsize=14, transform=ax.transAxes)
+		plt.text(0., 1.05, string.ascii_lowercase[itimes]+')  '+plot, fontsize=18, transform=ax.transAxes)
 
 		# Increment plot counter
         	itimes=itimes+1
 
-fig.subplots_adjust(hspace=0.25, wspace = 0.12, left = 0.1, right = 0.9, top = 0.945, bottom = 0.15)
+if paramname == 'T':
+	fig.text(0.97, 0.5, 'Zonal mean temperature anomaly [$K$]', fontsize=18, va='center', rotation=90)
+if paramname == 'U':
+	fig.text(0.97, 0.5, 'Zonal mean zonal wind anomaly [$m/s$]', fontsize=18, va='center', rotation=90)
+
+fig.subplots_adjust(hspace=0.3, wspace = 0.12, left = 0.1, right = 0.84, top = 0.86, bottom = 0.14)
 
 #for label in cbar_ax.xaxis.get_ticklabels()[::2]:
 #    label.set_visible(False)
-cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.794])
-cbar_ax.tick_params(labelsize=12) 
+cbar_ax = fig.add_axes([0.87, 0.12, 0.025, 0.76])
+cbar_ax.tick_params(labelsize=16) 
 
 colorbar_format = '% 1.1f'
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks,format=colorbar_format)
 
 degree_sign= u'\N{degree sign}'
-fig.text(0, 0.5, 'Pressure [hPa]', fontsize=16, va='center', rotation='vertical')
-fig.text(0.5, 0.01, 'Latitude ['+degree_sign+'N]', fontsize=16, ha='center')
+fig.text(0.001, 0.5, 'Pressure [hPa]', fontsize=18, va='center', rotation='vertical')
+fig.text(0.5, 0.01, 'Latitude ['+degree_sign+'N]', fontsize=18, ha='center')
 
 fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=900)
 
