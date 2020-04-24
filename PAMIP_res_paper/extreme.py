@@ -77,19 +77,19 @@ def time_assoc(data1, data2, ensnumber):
 	for ens in range(ensnumber):
 		for day in range(np.shape(data1)[1]-34):
 			#if param == 'T2M':
-			filt11 = val1[day-1,ens,:,:]*1+val1[day,ens,:,:]*1+val1[day+1,ens,:,:]*1
-			filt12 = val1[day,ens,:,:]*1+val1[day+1,ens,:,:]*1+val1[day+2,ens,:,:]*1
-			filt13 = val1[day+1,ens,:,:]*1+val1[day+2,ens,:,:]*1+val1[day+3,ens,:,:]*1
+			#filt11 = val1[day-1,ens,:,:]*1+val1[day,ens,:,:]*1+val1[day+1,ens,:,:]*1
+			#filt12 = val1[day,ens,:,:]*1+val1[day+1,ens,:,:]*1+val1[day+2,ens,:,:]*1
+			#filt13 = val1[day+1,ens,:,:]*1+val1[day+2,ens,:,:]*1+val1[day+3,ens,:,:]*1
 
-			filt21 = val2[day-1,ens,:,:]*1+val2[day,ens,:,:]*1+val2[day+1,ens,:,:]*1
-			filt22 = val2[day,ens,:,:]*1+val2[day+1,ens,:,:]*1+val2[day+2,ens,:,:]*1
-			filt23 = val2[day+1,ens,:,:]*1+val2[day+2,ens,:,:]*1+val2[day+3,ens,:,:]*1
+			#filt21 = val2[day-1,ens,:,:]*1+val2[day,ens,:,:]*1+val2[day+1,ens,:,:]*1
+			#filt22 = val2[day,ens,:,:]*1+val2[day+1,ens,:,:]*1+val2[day+2,ens,:,:]*1
+			#filt23 = val2[day+1,ens,:,:]*1+val2[day+2,ens,:,:]*1+val2[day+3,ens,:,:]*1
 
-			filt1 = np.maximum(filt11,filt12,filt13)
-			filt2 = np.maximum(filt21,filt22,filt23)
-			#if param == 'PRECIP':
-			#	filt1 = val1[day,ens,:,:]*3
-			#	filt2 = val2[day,ens,:,:]*3
+			#filt1 = np.maximum(filt11,filt12,filt13)
+			#filt2 = np.maximum(filt21,filt22,filt23)
+			if param == 'T2M':
+				filt1 = val1[day,ens,:,:]*3
+				filt2 = val2[day,ens,:,:]*3
 
 			filt1 = np.where(filt1>2,filt1/3,filt1*0)
 			filt2 = np.where(filt2>2,filt2/3,filt2*0)
@@ -100,6 +100,39 @@ def time_assoc(data1, data2, ensnumber):
 	number_of_days1 = np.where(number_of_days1>bound,1,0)
 	number_of_days2 = np.where(number_of_days2>bound,1,0)
 	return(np.sum(number_of_days1)/ensnumber, np.sum(number_of_days2)/ensnumber)
+
+def area_calc(data1, data2, ensnumber, cell_area):
+	sum_day1 = []
+	sum_day2 = []
+	for ens in range(ensnumber):
+		areavec_per_day1 = []
+		areavec_per_day2 = []
+		acum_day1 = []
+		acum_day2 = []
+
+		for day in range(np.shape(data1)[1]-31):
+			areavec_per_day1.append(val1[day,ens,:,:]*cell_area)
+			areavec_per_day2.append(val2[day,ens,:,:]*cell_area)
+		area_per_day1 = sum(areavec_per_day1,axis=(1,2))
+		area_per_day2 = sum(areavec_per_day2,axis=(1,2))
+
+		for day in range(2,np.shape(data1)[1]-33):
+			if (area_per_day1[day] > min_area and area_per_day1[day+1] > min_area and area_per_day1[day+2] > min_area or
+					area_per_day1[day-1] > min_area and area_per_day1[day] > min_area and area_per_day1[day+1] > min_area or
+                                        area_per_day1[day-2] > min_area and area_per_day1[day-1] > min_area and area_per_day1[day] > min_area):
+				acum_day1.append(1)
+			else:
+				acum_day1.append(0)
+
+			if (area_per_day2[day] > min_area and area_per_day2[day+1] > min_area and area_per_day2[day+2] > min_area or
+					area_per_day2[day-1] > min_area and area_per_day2[day] > min_area and area_per_day2[day+1] > min_area or
+                                        area_per_day2[day-2] > min_area and area_per_day2[day-1] > min_area and area_per_day2[day] > min_area):
+				acum_day2.append(1)
+			else:
+				acum_day2.append(0)
+		sum_day1.append(sum(acum_day1))
+		sum_day2.append(sum(acum_day2))
+	return(mean(sum_day1),mean(sum_day2))
 
 
 if __name__ == '__main__':
@@ -133,13 +166,16 @@ if __name__ == '__main__':
 				start = 101
 				end = 301
 				bound = 1
-			bound=bound*1 # Determines minimum size to count as extreme event
+			bound=bound*32 # Determines minimum size to count as extreme event
+			min_area = 500000*1000000
 			ensnumber = end-start
 			datapath1=basepath+res+'/Experiment_'+exp1+'/'
 			datapath2=basepath+res+'/Experiment_'+exp2+'/'    
 
 			data1 = read_file_par(ensnumber,datapath1,paramname,param,start)
 			data2 = read_file_par(ensnumber,datapath2,paramname,param,start)
+			area_path = basepath+res+'/gridarea/'+res+'_'+area+'_gridarea.nc'
+			cell_area = Dataset(area_path).variables['cell_area'][:]
 
 			data1 = np.squeeze(data1)
 			data2 = np.squeeze(data2)
@@ -154,20 +190,21 @@ if __name__ == '__main__':
 			val1 = np.squeeze(np.asarray(val))[:,0]
 			val2 = np.squeeze(np.asarray(val))[:,1]
 			
-			inn1, inn2 = time_assoc(data1, data2, ensnumber)
+			#inn1, inn2 = time_assoc(data1, data2, ensnumber) #old routine
+			area1, area2 = area_calc(data1, data2, ensnumber, cell_area)
 
-			val1ap.append(np.squeeze(np.asarray(inn1)))
-			val2ap.append(np.squeeze(np.asarray(inn2)))
+			val1ap.append(np.squeeze(np.asarray(area1)))
+			val2ap.append(np.squeeze(np.asarray(area2)))
 			
 			number_of_days = 0
 					
 
 	if param == 'T2M':
-		plt.ylabel('Cold spell days',fontsize=14)
+		plt.ylabel('Cold spell days / season',fontsize=14)
 	else:
-		plt.ylabel('Heavy precipitation days',fontsize=14)
+		plt.ylabel('Heavy precipitation days / season',fontsize=14)
 
-	plt.xlabel('                  Arctic                           Eurasia                       North America           ',fontsize=14)
+	plt.xlabel('                  Arctic                           Eurasia                      North America            ',fontsize=14)
 	barWidth = 0.3
 	r1 = np.arange(len(val1ap))
 	r2 = [x + barWidth for x in r1]
