@@ -52,8 +52,8 @@ def resample(xyobs,n,m):
 	for mi in range(m):
 		r = rd.randrange(0, xyobs.shape[0])
 		ystar.append(xyobs[r])
-	xbarstar = np.mean(np.asarray(xstar),axis=0)
-	ybarstar = np.mean(np.asarray(ystar),axis=0)
+	xbarstar = np.ma.mean(np.asarray(xstar),axis=0)
+	ybarstar = np.ma.mean(np.asarray(ystar),axis=0)
 	t = xbarstar - ybarstar
 	return t
 
@@ -146,8 +146,8 @@ if __name__ == '__main__':
 				data3[i] = data3[i][0,:,:]
 				data4[i] = data4[i][0,:,:]
 
-		data1 = np.squeeze(np.mean(np.asarray(data3),axis=0))
-		data2 = np.squeeze(np.mean(np.asarray(data4),axis=0))
+		data1 = np.squeeze(np.ma.mean(np.ma.asarray(data3),axis=0))
+		data2 = np.squeeze(np.ma.mean(np.ma.asarray(data4),axis=0))
 
 		datadict1[res] = data1 
 		datadict2[res] = data2 
@@ -228,8 +228,8 @@ if paramname == 'InstBlock':
 	fig.text(0.94, 0.5, 'Instant Blocking frequency anomaly [$\%$]', fontsize=17, va='center', rotation=90)
 if paramname == 'ExtraBlock':
 	fig.text(0.94, 0.5, 'Extra Blocking frequency anomaly [$\%$]', fontsize=17, va='center', rotation=90)
-if paramname == 'ExtrBlock':
-	fig.text(0.94, 0.5, 'Extra Blocking frequency anomaly [$\%$]', fontsize=17, va='center', rotation=90)
+if paramname == 'DurationEvents':
+	fig.text(0.94, 0.5, 'Anomaly of avg. blocking event duration [$days$]', fontsize=17, va='center', rotation=90)
 
 fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0, right = 0.8, top = 1, bottom = 0)
 #fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.75, top = 0.95, bottom = 0.05)

@@ -36,6 +36,7 @@ import dask
 from dask.delayed import delayed
 from dask.diagnostics import ProgressBar
 from ttictoc import TicToc
+import string
 t = TicToc() ## TicToc("name")
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -149,22 +150,23 @@ if __name__ == '__main__':
 	fig =  plt.figure(figsize=(9,6))
 
 
-	val1ap = []
-	val2ap = []
-	for area in [ 'NP', 'EA', 'NA' ]:
+	for area in [ 'NP','EU', 'AS', 'NA' ]:
+		areanames = [ 'Arctic', 'Europe', 'Asia', 'North America' ]
+		val1ap = []
+		val2ap = []
 		for res in reslist:
 			print('reading files for',res)
 			if res == 'T1279':
 				start = 61
-				end = 101
+				end = 100
 				bound = 61
 			if res == 'T511':
 				start = 101
-				end = 201
-				bound = 10
+				end = 200
+				bound = 200
 			if res == 'T159':
 				start = 101
-				end = 301
+				end = 300
 				bound = 1
 			bound=bound*32 # Determines minimum size to count as extreme event
 			min_area = 500000*1000000
@@ -199,21 +201,23 @@ if __name__ == '__main__':
 			number_of_days = 0
 					
 
-	if param == 'T2M':
-		plt.ylabel('Cold spell days / season',fontsize=14)
-	else:
-		plt.ylabel('Heavy precipitation days / season',fontsize=14)
+		ax=plt.subplot(2,2,itimes+1)
+		barWidth = 0.3
+		r1 = np.arange(len(val1ap))
+		r2 = [x + barWidth for x in r1]
+		leng= len(val1ap)
+		
+		plt.bar(r1, val1ap, color = 'b', width=barWidth, edgecolor='black', label='PD')
+		plt.bar(r2, val2ap, color = 'r', width=barWidth, edgecolor='black', label='FU')
+		if ( itimes==0 ):
+			plt.legend()
+		plt.xticks([r + barWidth for r in range(leng)], ['T159', 'T511', 'T1279' ],fontsize=14)
+		ax.set_ylim(ymin=0,ymax=80)
+		plt.text(0.,1.105,string.ascii_lowercase[itimes]+')  '+areanames[itimes], verticalalignment='top', horizontalalignment='left', fontsize=16, transform=ax.transAxes)
 
-	plt.xlabel('                  Arctic                           Eurasia                      North America            ',fontsize=14)
-	barWidth = 0.3
-	r1 = np.arange(len(val1ap))
-	r2 = [x + barWidth for x in r1]
-	leng= len(val1ap)
-	
-	plt.bar(r1, val1ap, color = 'b', width=barWidth, edgecolor='black', label='PD')
-	plt.bar(r2, val2ap, color = 'r', width=barWidth, edgecolor='black', label='FU')
-	plt.axvline(2.65, color='black', linestyle='-',linewidth=0.7)
-	plt.axvline(5.65, color='black', linestyle='-',linewidth=0.7)
-	plt.legend()
-	plt.xticks([r + barWidth for r in range(leng)], ['T159', 'T511', 'T1279', 'T159', 'T511', 'T1279', 'T159', 'T511', 'T1279', ])
-	fig.savefig(outpath+paramname+'_extremes.png', dpi=900)
+		# Increment plot counter
+		itimes=itimes+1
+
+fig.text(0.001, 0.5, 'Cold spell days / season', fontsize=18, va='center', rotation='vertical')
+fig.subplots_adjust(hspace=0.3, wspace = 0.21, left = 0.08, right = 0.99, top = 0.9, bottom = 0.1)
+fig.savefig(outpath+paramname+'_extremes.png', dpi=900)
