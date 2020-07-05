@@ -109,97 +109,82 @@ if __name__ == '__main__':
 	mapticks=np.asarray(map(float, sys.argv[10].split(',')))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,6))
 	datadict1 = {}
 	datadict2 = {}
 	datadict3 = {}
 	datadict4 = {}
 
-	#print(reslist)
-	for res in reslist:
-		print('reading files for',res)
-		if res == 'T1279':
-			ensnumber = 100
-		if res == 'T511':
-			ensnumber = 100
-		if res == 'T159':
-			ensnumber = 200
-		if paramname == 'synact':
-			datapath1=basepath+res+'/Experiment_'+exp1+'/synact/'
-			datapath2=basepath+res+'/Experiment_'+exp2+'/synact/'
-			dataset3=[]
-			dataset4=[]
-			data3=[]
-			data4=[]
+	res='T159'
+	ensnumber = 300
+	datapath3=basepath+res+'/Experiment_'+exp1+'/'
+	datapath4=basepath+res+'/Experiment_'+exp2+'/'    
+	data3=[]
+	data4=[]
 
-			# Reading netcdf files
-			ncfile1 = datapath1+'3D_timstd_'+season+'.nc'
-			ncfile2 = datapath2+'3D_timstd_'+season+'.nc'
-			dataset1 = Dataset(ncfile1)
-			dataset2 = Dataset(ncfile2)
+	for i in tqdm(range(300)):
+		ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+		ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
 
-			if str(sys.argv[9]) == "true":
-				for i in range(ensnumber):
-				     ncfile3 = datapath1+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
-				     ncfile4 = datapath2+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
-				     dataset3.append(Dataset(ncfile3))
-				     dataset4.append(Dataset(ncfile4))
+		data3.append(Dataset(ncfile3).variables[param][:])
+		data4.append(Dataset(ncfile4).variables[param][:])
+	# in case data has multiple levels, select only the (50000 hPa) 
+		if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
+			if [ res == 'T1279' ]:
+				data3[i] =  data3[i][0,4,:,:]
+				data4[i] =  data4[i][0,4,:,:]
+			else:
+				data3[i] =  data3[i][0,5,:,:]
+				data4[i] =  data4[i][0,5,:,:]
 		else:
-			datapath3=basepath+res+'/Experiment_'+exp1+'/'
-			datapath4=basepath+res+'/Experiment_'+exp2+'/'    
-			data3=[]
-			data4=[]
+			data3[i] = data3[i][0,:,:]
+			data4[i] = data4[i][0,:,:]
 
-			for i in tqdm(range(ensnumber)):
-				ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
-				ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+	data1 = np.mean(np.asarray(data3),axis=0)
+	data2 = np.mean(np.asarray(data4),axis=0)
 
-				data3.append(Dataset(ncfile3).variables[param][:])
-				data4.append(Dataset(ncfile4).variables[param][:])
-			# in case data has multiple levels, select only the (50000 hPa) 
-				if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
-					if [ res == 'T1279' ]:
-						data3[i] =  data3[i][0,4,:,:]
-						data4[i] =  data4[i][0,4,:,:]
-					else:
-						data3[i] =  data3[i][0,5,:,:]
-						data4[i] =  data4[i][0,5,:,:]
-				else:
-					data3[i] = data3[i][0,:,:]
-					data4[i] = data4[i][0,:,:]
-
-		data1 = np.mean(np.asarray(data3),axis=0)
-		data2 = np.mean(np.asarray(data4),axis=0)
-
-		datadict1[res] = data1 
-		datadict2[res] = data2 
-		datadict3[res] = data3 
-		datadict4[res] = data4 
+	datadict1['T159 shift'] = data1 
+	datadict2['T159 shift'] = data2 
+	datadict3['T159 shift'] = data3 
+	datadict4['T159 shift'] = data4 
 			
-	for plot in [ 'T159', 'T511', 'T1279', 'T511-T159', 'T1279-T159', 'T1279-T511' ]:
+	data3=[]
+	data4=[]
+	for i in tqdm(range(300)):
+		ncfile3 = datapath3+'E'+str(i+301).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+		ncfile4 = datapath4+'E'+str(i+301).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+		data3.append(Dataset(ncfile3).variables[param][:])
+		data4.append(Dataset(ncfile4).variables[param][:])
+	# in case data has multiple levels, select only the (50000 hPa) 
+		if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
+			if [ res == 'T1279' ]:
+				data3[i] =  data3[i][0,4,:,:]
+				data4[i] =  data4[i][0,4,:,:]
+			else:
+				data3[i] =  data3[i][0,5,:,:]
+				data4[i] =  data4[i][0,5,:,:]
+		else:
+			data3[i] = data3[i][0,:,:]
+			data4[i] = data4[i][0,:,:]
+
+	data1 = np.mean(np.asarray(data3),axis=0)
+	data2 = np.mean(np.asarray(data4),axis=0)
+
+	datadict1['T159 correct'] = data1 
+	datadict2['T159 correct'] = data2 
+	datadict3['T159 correct'] = data3 
+	datadict4['T159 correct'] = data4 
 
 
-		if plot == 'T159' or plot == 'T511' or plot == 'T1279':
+
+	fig =  plt.figure(figsize=(9,6))
+	for plot in [ 'T159 shift', 'T159 correct' ]:
+
+
+		if plot == 'T159 shift' or plot == 'T159 correct':
 			data1 = datadict1[plot]
 			data2 = datadict2[plot]
 			data3 = datadict3[plot]
 			data4 = datadict4[plot]
-		if plot == 'T511-T159':
-			data1 = datadict2['T159']-datadict1['T159']
-			data2 = datadict2['T511']-datadict1['T511']
-			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
-			data4 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
-		if plot == 'T1279-T159':
-			data1 = datadict2['T159']-datadict1['T159']
-			data2 = datadict2['T1279']-datadict1['T1279']
-			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
-			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
-		if plot == 'T1279-T511':
-			data1 = datadict2['T511']-datadict1['T511']
-			data2 = datadict2['T1279']-datadict1['T1279']
-			data3 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
-			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
-
 
 		# Calculating Bootstrap test
 		xyobs = np.asarray(np.concatenate([data3,data4]))
@@ -227,7 +212,7 @@ if __name__ == '__main__':
 		data_cat3 = Ngl.add_cyclic(data_cat3)	
 
 		# Set position of subplot and some general settings for basemap
-		ax=plt.subplot(2,3,itimes+1)
+		ax=plt.subplot(1,2,itimes+1)
 		m=Basemap(projection='npstere',boundinglat=area,lon_0=0,resolution='c')
 		lon2,lat2 = np.meshgrid(lons,lats)
 		x, y = m(lon2, lat2)
@@ -262,7 +247,7 @@ if paramname == 'Z':
 if paramname == 'MSL':
 	fig.text(0.97, 0.5, 'Mean surface level pressure anomaly [$Pa$]', fontsize=16, va='center', rotation=90)
 
-fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0, right = 0.8, top = 1, bottom = 0)
+fig.subplots_adjust(hspace=-0.099, wspace = 0.1, left = 0, right = 0.8, top = 1, bottom = 0)
 #fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.75, top = 0.95, bottom = 0.05)
 cbar_ax = fig.add_axes([0.835, 0.16, 0.023, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 

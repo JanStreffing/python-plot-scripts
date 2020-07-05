@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
+for todo in Z MSL #T2M #sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
 do
 
 	# Synoptic Eddy Vorticity Forcing
@@ -54,19 +54,19 @@ do
 
 	# z500 hPa polar plots 
 	if [[ "$todo" == "Z" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 18 
+		python nh_stereo_diff_res.py 11 16 T159 Z Z $input_path 9.81 $output_path true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 18 
 	fi
 
 
 	# t2m hPa polar plots 
 	if [[ "$todo" == "T2M" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 T2M T2M $input_path 1 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
+		python nh_stereo_diff_res.py 11 16 T159 T2M T2M $input_path 1 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
 	fi
 
 
 	# MSL polar plots
 	if [[ "$todo" == "MSL" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 MSL MSL $input_path 1 $output_path true -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 17 
+		python nh_stereo_diff_res.py 11 16 T159 MSL MSL $input_path 1 $output_path true -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 17 
 	fi
 
 
