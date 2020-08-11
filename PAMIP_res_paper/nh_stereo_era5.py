@@ -82,13 +82,13 @@ if __name__ == '__main__':
 		print('reading files for',res)
 		if res == 'T1279':
 			first = 1
-			last = 10
+			last = 100
 		if res == 'T511':
 			first = 1
-			last = 10
+			last = 200
 		if res == 'T159':
 			first = 301
-			last = 10
+			last = 300
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
 		datapath4='/p/project/chhb19/jstreffi/obs/era5/netcdf/'    
 		data3=[]

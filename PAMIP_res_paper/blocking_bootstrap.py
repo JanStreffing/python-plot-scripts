@@ -129,8 +129,12 @@ if __name__ == '__main__':
 		data4=[]
 
 		for i in tqdm(range(ensnumber)):
-			ncfile3 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
-			ncfile4 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
+			if res == 'T159':
+				ncfile3 = datapath+res+'_'+str(i+301).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+301).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
+				ncfile4 = datapath+res+'_'+str(i+301).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+301).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
+			else:
+				ncfile3 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
+				ncfile4 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
 
 			data3.append(Dataset(ncfile3).variables[param][:])
 			data4.append(Dataset(ncfile4).variables[param][:])

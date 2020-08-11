@@ -253,7 +253,7 @@ cbar_ax = fig.add_axes([0.835, 0.16, 0.023, 0.67])
 cbar_ax.tick_params(labelsize=int(sys.argv[12])) 
 colorbar_format = '% 1.1f'
 fig.colorbar(im, cax=cbar_ax, orientation='vertical', extend='both',ticks=mapticks,format=colorbar_format)
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff.png', dpi=600)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_map_diff_res.png', dpi=600)
 
 
 

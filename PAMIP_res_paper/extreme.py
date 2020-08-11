@@ -165,8 +165,8 @@ if __name__ == '__main__':
 				end = 200
 				bound = 200
 			if res == 'T159':
-				start = 101
-				end = 300
+				start = 301
+				end = 600
 				bound = 1
 			bound=bound*32 # Determines minimum size to count as extreme event
 			min_area = 500000*1000000

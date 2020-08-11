@@ -63,7 +63,7 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = []
 	n = xyobs.shape[0]//2
 	m = xyobs.shape[0]//2
-	B = 20
+	B = 20000
 
 	for bi in tqdm(range(B)):
 		t = dask.delayed(resample)(xyobs,n,m)
@@ -99,86 +99,111 @@ if __name__ == '__main__':
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,5.5))
 	datadict1 = {}
 	datadict2 = {}
 	datadict3 = {}
 	datadict4 = {}
 
-	for res in reslist:
-		if res == 'T1279':
-			ensnumber = 100
-		if res == 'T511':
-			ensnumber = 100
-		if res == 'T159':
-			ensnumber = 2
+	res='T159'
+	ensnumber = 300
 
 
-		datapath3=basepath+res+'/Experiment_'+exp1+'/'
-		datapath4=basepath+res+'/Experiment_'+exp2+'/'    
-		data3=[]
-		data4=[]
+	datapath3=basepath+res+'/Experiment_'+exp1+'/'
+	datapath4=basepath+res+'/Experiment_'+exp2+'/'    
+	data3=[]
+	data4=[]
 
-		for i in tqdm(range(ensnumber)):
-			ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
-			ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+	for i in tqdm(range(ensnumber)):
+		ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+		ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
 
-			data3.append(Dataset(ncfile3).variables[param][:])
-			data4.append(Dataset(ncfile4).variables[param][:])
-			data3[i] =  data3[i][0,:,:,:]
-			data4[i] =  data4[i][0,:,:,:]
+		data3.append(Dataset(ncfile3).variables[param][:])
+		data4.append(Dataset(ncfile4).variables[param][:])
+		data3[i] =  data3[i][0,:,:,:]
+		data4[i] =  data4[i][0,:,:,:]
 
-		data1 = np.mean(np.asarray(data3),axis=0)
-		data2 = np.mean(np.asarray(data4),axis=0)
-		
-		print(np.asarray(data1).shape)
-		print(np.asarray(data3).shape)
-		res1=np.mean(data1,axis=2)
-		res2=np.mean(data2,axis=2)
-		res3=np.mean(data3,axis=3)
-		res4=np.mean(data4,axis=3)
-		import pdb
-                pdb.set_trace()
-		if param == 'T':
-			res1= res1-273.15
-			res2= res2-273.15
-			res3= res3-273.15
-			res4= res4-273.15
+	data1 = np.mean(np.asarray(data3),axis=0)
+	data2 = np.mean(np.asarray(data4),axis=0)
+	
+	print(np.asarray(data1).shape)
+	print(np.asarray(data3).shape)
+	res1=np.mean(data1,axis=2)
+	res2=np.mean(data2,axis=2)
+	res3=np.mean(data3,axis=3)
+	res4=np.mean(data4,axis=3)
+	if param == 'T':
+		res1= res1-273.15
+		res2= res2-273.15
+		res3= res3-273.15
+		res4= res4-273.15
 
-                lats = Dataset(ncfile3).variables[u'lat'][:]
-                levs = Dataset(ncfile3).variables[u'plev'][:]
+	if param == 'Z':
+		res1= res1/9.81
+		res2= res2/9.81
+		res3= res3/9.81
+		res4= res4/9.81
 
-		datadict1[res] = res1 
-		datadict2[res] = res2
-		datadict3[res] = res3 
-		datadict4[res] = res4 	
-
-
-	for plot in [ 'T159', 'T511', 'T1279', 'T511-T159', 'T1279-T159', 'T1279-T511' ]:
+        datadict1['T159 shift'] = res1
+        datadict2['T159 shift'] = res2
+        datadict3['T159 shift'] = res3
+        datadict4['T159 shift'] = res4
 
 
-		if plot == 'T159' or plot == 'T511' or plot == 'T1279':
-			data1 = datadict1[plot]
-			data2 = datadict2[plot]
-			data3 = datadict3[plot]
-			data4 = datadict4[plot]
-		if plot == 'T511-T159':
-			data1 = datadict2['T159']-datadict1['T159']
-			data2 = datadict2['T511']-datadict1['T511']
-			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
-			data4 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
-		if plot == 'T1279-T159':
-			data1 = datadict2['T159']-datadict1['T159']
-			data2 = datadict2['T1279']-datadict1['T1279']
-			data3 = np.asarray(datadict4['T159'])-np.asarray(datadict3['T159'])
-			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
-		if plot == 'T1279-T511':
-			data1 = datadict2['T511']-datadict1['T511']
-			data2 = datadict2['T1279']-datadict1['T1279']
-			data3 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
-			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
 
-		# Calculating Bootstrap test
+
+
+	data3=[]
+	data4=[]
+
+	for i in tqdm(range(ensnumber)):
+		ncfile3 = datapath3+'E'+str(i+301).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+		ncfile4 = datapath4+'E'+str(i+301).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+
+		data3.append(Dataset(ncfile3).variables[param][:])
+		data4.append(Dataset(ncfile4).variables[param][:])
+		data3[i] =  data3[i][0,:,:,:]
+		data4[i] =  data4[i][0,:,:,:]
+
+	data1 = np.mean(np.asarray(data3),axis=0)
+	data2 = np.mean(np.asarray(data4),axis=0)
+	
+	print(np.asarray(data1).shape)
+	print(np.asarray(data3).shape)
+	res1=np.mean(data1,axis=2)
+	res2=np.mean(data2,axis=2)
+	res3=np.mean(data3,axis=3)
+	res4=np.mean(data4,axis=3)
+	if param == 'T':
+		res1= res1-273.15
+		res2= res2-273.15
+		res3= res3-273.15
+		res4= res4-273.15
+
+	if param == 'Z':
+		res1= res1/9.81
+		res2= res2/9.81
+		res3= res3/9.81
+		res4= res4/9.81
+
+	lats = Dataset(ncfile3).variables[u'lat'][:]
+	levs = Dataset(ncfile3).variables[u'plev'][:]
+
+
+        datadict1['T159 correct'] = res1
+        datadict2['T159 correct'] = res2
+        datadict3['T159 correct'] = res3
+        datadict4['T159 correct'] = res4
+
+
+	fig =  plt.figure(figsize=(9,5.5))
+        for plot in [ 'T159 shift', 'T159 correct' ]:
+                if plot == 'T159 shift' or plot == 'T159 correct':
+                        data1 = datadict1[plot]
+                        data2 = datadict2[plot]
+                        data3 = datadict3[plot]
+                        data4 = datadict4[plot]
+
+		# Calculating B otstrap test
 		xyobs = np.asarray(np.concatenate([data3,data4]))
 		t.tic()
 		pvalue = bootstrap(xyobs, data1, data2)
@@ -187,7 +212,7 @@ if __name__ == '__main__':
 		data_sig = np.ma.masked_greater(np.asarray(pvalue), 0.025)
 
 		# Set axis labeling and sharing
-		ax=plt.subplot(2,3,itimes+1)
+		ax=plt.subplot(1,2,itimes+1)
 		plt.tick_params(labelsize=12)
 		if itimes % 3 != 0:
 			plt.setp(ax.get_yticklabels(), visible=False)
@@ -243,7 +268,7 @@ degree_sign= u'\N{degree sign}'
 fig.text(0.001, 0.5, 'Pressure [hPa]', fontsize=18, va='center', rotation='vertical')
 fig.text(0.5, 0.01, 'Latitude ['+degree_sign+'N]', fontsize=18, ha='center')
 
-fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff.png', dpi=900)
+fig.savefig(outpath+paramname+'_'+exp2+'_'+exp1+'_zonal_diff_res.png', dpi=900)
 
 
 

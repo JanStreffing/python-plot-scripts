@@ -85,7 +85,7 @@ if __name__ == '__main__':
 				start=100
 				ensnumber = 100
 			if res == 'T159':
-				start=100
+				start=300
 				ensnumber = 200
 			datapath=basepath+res+'/Experiment_'+exp+'/'
 			data=[]
