@@ -56,8 +56,8 @@ def resample(B,data):
 	resmaple_intermean = []
 	for b in range(B):
 		res.append(dask.delayed(resample_inner_loop)(data))
-        with ProgressBar():
-                resample = dask.compute(res)
+	with ProgressBar():
+		resample = dask.compute(res)
 	return np.squeeze(np.asarray(resample))
 
 
@@ -66,22 +66,13 @@ def read_inner(ncfile1, param):
 	return data1
 
 
-def read_file_par(ensnumber,datapath1,paramname,param):
+def read_file_par(start,ensnumber,datapath1,paramname,param):
 	data1 = []
 	for i in range(ensnumber):
-		ncfile1 = datapath1+'E'+str(i+1).zfill(3)+'/outdata/oifs/monthly_mean/'+paramname+'_monmean.nc'			
+		ncfile1 = datapath1+'E'+str(i+start).zfill(3)+'/outdata/oifs/monthly_mean/'+paramname+'_monmean.nc'			
 		data1.append(dask.delayed(read_inner)(ncfile1, param))
-        with ProgressBar():
-               	d = dask.compute(data1)
-	return d
-
-def read_file_par2(ensnumber,datapath1,paramname,param):
-	data1 = []
-	for i in range(ensnumber):
-		ncfile1 = datapath1+'E'+str(i+101).zfill(3)+'/outdata/oifs/monthly_mean/'+paramname+'_monmean.nc'			
-		data1.append(dask.delayed(read_inner)(ncfile1, param))
-        with ProgressBar():
-               	d = dask.compute(data1)
+	with ProgressBar():
+		d = dask.compute(data1)
 	return d
 
 def read_file_squ(ensnumber,datapath1,paramname,param):
@@ -113,24 +104,19 @@ if __name__ == '__main__':
 	B=1000
 	for resolution in reslist:
 		if resolution == 'T1279':
-			ensnumber = 100
-			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
-			d1 = read_file_par(ensnumber,datapath1,paramname,param)
-			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
-			d2 = read_file_par(ensnumber,datapath2,paramname,param)
+			start = 101
+			ensnumber = 94
 		elif resolution == 'T511':
+			start = 201
 			ensnumber = 100
-			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
-			d1 = read_file_par(ensnumber,datapath1,paramname,param)
-			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
-			d2 = read_file_par(ensnumber,datapath2,paramname,param)
 		elif resolution == 'T159':
+			start = 301
 			ensnumber = 100
-			datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
-			d1 = read_file_par(ensnumber,datapath1,paramname,param)
-			datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
-			d2 = read_file_par(ensnumber,datapath2,paramname,param)
 
+		datapath1=basepath+resolution+'/Experiment_'+exp1+'/'
+		d1 = read_file_par(start,ensnumber,datapath1,paramname,param)
+		datapath2=basepath+resolution+'/Experiment_'+exp2+'/'
+		d2 = read_file_par(start,ensnumber,datapath2,paramname,param)
 
 	
 		d = np.asarray(d1)-np.asarray(d2)
@@ -144,11 +130,11 @@ if __name__ == '__main__':
 # --- Calculating RMSE
 		mean = np.mean(np.squeeze(np.asarray(d)), axis=0)
 		rmse = []
-		for i in range(0,100):
+		for i in range(0,94):
 			rmse.append(get_rmse(B,i,res,mean))
 			#rmse.append(dask.delayed(get_rmse)(i,res,mean))
-        	with ProgressBar():
-               		rmse_final = dask.compute(rmse)
+		with ProgressBar():
+			rmse_final = dask.compute(rmse)
 		rmse_list.append(np.squeeze(np.asarray(rmse_final)))
 	
 	x = np.linspace(1,100,100)

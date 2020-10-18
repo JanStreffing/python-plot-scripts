@@ -81,20 +81,21 @@ if __name__ == '__main__':
 	for res in reslist:
 		print('reading files for',res)
 		if res == 'T1279':
-			first = 1
-			last = 100
+			first = 101
+			last = 194
 		if res == 'T511':
-			first = 1
-			last = 200
+			first = 201
+			last = 300
 		if res == 'T159':
 			first = 301
-			last = 300
+			last = 600
+		ensnumber = last-first+1
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
 		datapath4='/p/project/chhb19/jstreffi/obs/era5/netcdf/'    
 		data3=[]
 		data4=[]
 
-		for i in tqdm(range(last)):
+		for i in tqdm(range(ensnumber)):
 			ncfile3 = datapath3+'E'+str(i+first).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
 			ncfile4 = datapath4+paramname+'_DJFM.nc'
 
@@ -102,12 +103,8 @@ if __name__ == '__main__':
 			data4.append(Dataset(ncfile4).variables[param][:])
 		# in case data has multiple levels, select only the (50000 hPa) 
 			if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
-				if res == 'T1279':
-					data3[i] =  data3[i][0,4,:,:]
-					data4[i] =  data4[i][0,13,:,:]
-				else:
-					data3[i] =  data3[i][0,5,:,:]
-					data4[i] =  data4[i][0,13,:,:]
+				data3[i] =  data3[i][0,5,:,:]
+				data4[i] =  data4[i][0,13,:,:]
 					
 			else:
 				data3[i] = data3[i][0,:,:]

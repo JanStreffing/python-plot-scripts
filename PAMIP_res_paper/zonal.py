@@ -63,7 +63,7 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = []
 	n = xyobs.shape[0]//2
 	m = xyobs.shape[0]//2
-	B = 20
+	B = 20000
 
 	for bi in tqdm(range(B)):
 		t = dask.delayed(resample)(xyobs,n,m)
@@ -107,11 +107,16 @@ if __name__ == '__main__':
 
 	for res in reslist:
 		if res == 'T1279':
-			ensnumber = 100
+			start = 101
+			end = 194
 		if res == 'T511':
-			ensnumber = 100
+			start = 201
+			end = 300
 		if res == 'T159':
-			ensnumber = 2
+			start = 301
+			end = 600
+
+		ensnumber = end-start+1
 
 
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
@@ -120,8 +125,8 @@ if __name__ == '__main__':
 		data4=[]
 
 		for i in tqdm(range(ensnumber)):
-			ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
-			ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
+			ncfile3 = datapath3+'E'+str(i+start).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+			ncfile4 = datapath4+'E'+str(i+start).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
 
 			data3.append(Dataset(ncfile3).variables[param][:])
 			data4.append(Dataset(ncfile4).variables[param][:])
@@ -137,8 +142,8 @@ if __name__ == '__main__':
 		res2=np.mean(data2,axis=2)
 		res3=np.mean(data3,axis=3)
 		res4=np.mean(data4,axis=3)
-		import pdb
-                pdb.set_trace()
+		#import pdb
+                #pdb.set_trace()
 		if param == 'T':
 			res1= res1-273.15
 			res2= res2-273.15

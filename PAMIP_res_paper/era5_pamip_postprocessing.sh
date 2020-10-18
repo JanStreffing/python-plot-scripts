@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in MSL T2M Z #sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
+for todo in U T2M MSL Z #sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
 do
 
 	# Synoptic Eddy Vorticity Forcing

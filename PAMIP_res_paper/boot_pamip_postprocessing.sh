@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
+for todo in Z #ExtraBlock # U Z T2M sevf synact sevf_abs haus InstBlock SD
 do
 
 	# Synoptic Eddy Vorticity Forcing
@@ -54,7 +54,7 @@ do
 
 	# z500 hPa polar plots 
 	if [[ "$todo" == "Z" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -30,-26,-22,-18,-14,-10,-6,-2,2,6,10,14,18,22,26,30 colorbar_TR_15 18 
+		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -22,-18,-14,-10,-6,-2,2,6,10,14,18,22 colorbar_TR_15 18 
 	fi
 
 
@@ -111,7 +111,7 @@ do
 
         if [[ "$todo" == "forcing" ]]; then
                 #python nh_stereo_forcing.py 11 16 dummy sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1
-                python nh_stereo_forcing.py 11 16 dummy sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,10,20,30,40,50,60,70,80,90,100
+                python nh_stereo_forcing.py 11 16 T159,T511,T1279 sic sic $input_path 1 $output_path false -1,-.9,-.8,-.7,-.6,-.5,-.4,-.3,-.2,-.1,-0 colorbar_red 16 0,10,20,30,40,50,60,70,80,90,100
         fi
 
 

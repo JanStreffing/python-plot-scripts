@@ -97,12 +97,17 @@ if __name__ == '__main__':
 	fig, ax = plt.subplots(figsize=(4.5,3))
 	for res in reslist:
 		print('reading files for',res)
-		if res == 'T1279':
-			ensnumber = 100
-		if res == 'T511':
-			ensnumber = 100
-		if res == 'T159':
-			ensnumber = 200
+                if res == 'T1279':
+                        start = 101
+                        end = 194
+                if res == 'T511':
+                        start = 201
+                        end = 300
+                if res == 'T159':
+                        start = 301
+                        end = 600
+
+                ensnumber = end-start+1
 		datapath1=basepath+res+'/Experiment_'+exp1+'/'
 		datapath2=basepath+res+'/Experiment_'+exp2+'/'    
 		data1=[]
@@ -110,11 +115,11 @@ if __name__ == '__main__':
 
 		for i in tqdm(range(ensnumber)):
 			if var == 'T2M':
-				ncfile1 = datapath1+'E'+str(i+1).zfill(3)+'/outdata/oifs/forcing/T2M_forcing_glob.nc'
-				ncfile2 = datapath2+'E'+str(i+1).zfill(3)+'/outdata/oifs/forcing/T2M_forcing_glob.nc'
+				ncfile1 = datapath1+'E'+str(i+start).zfill(3)+'/outdata/oifs/forcing/T2M_forcing_glob.nc'
+				ncfile2 = datapath2+'E'+str(i+start).zfill(3)+'/outdata/oifs/forcing/T2M_forcing_glob.nc'
 			else:
-				ncfile1 = datapath1+'E'+str(i+1).zfill(3)+'/outdata/oifs/forcing/NET_SURF_forcing_glob.nc'
-				ncfile2 = datapath2+'E'+str(i+1).zfill(3)+'/outdata/oifs/forcing/NET_SURF_forcing_glob.nc'
+				ncfile1 = datapath1+'E'+str(i+start).zfill(3)+'/outdata/oifs/forcing/NET_SURF_forcing_glob.nc'
+				ncfile2 = datapath2+'E'+str(i+start).zfill(3)+'/outdata/oifs/forcing/NET_SURF_forcing_glob.nc'
 
 			data1.append(Dataset(ncfile1).variables[var][:])
 			data2.append(Dataset(ncfile2).variables[var][:])
@@ -160,6 +165,7 @@ if __name__ == '__main__':
 		ax.set_xticks(drange)
 		ax.tick_params(labelsize=9)
 
+print(np.shape(np.squeeze(data4m-data3m)))
 ax2=ax.twinx()
 plt.axhline(0, color='grey', lw=0.5)
 plotSIC,=ax2.plot(drange,np.squeeze(data4m-data3m)/1000000000000,linewidth=2,color='Black', label="SIC")

@@ -119,33 +119,28 @@ if __name__ == '__main__':
 	for res in reslist:
 		print('reading files for',res)
 		if res == 'T1279':
-			ensnumber=100
+			start=100
+			ensnumber = 94
 		if res == 'T511':
-			ensnumber=100
+			start=100
+			ensnumber = 200
 		if res == 'T159':
-			ensnumber=200
+			start=500
+			ensnumber = 100
 		datapath='/p/largedata/hhb19/jstreffi/runtime/oifsamip/MILES/files/Block/'
 		data3=[]
 		data4=[]
 
 		for i in tqdm(range(ensnumber)):
-			if res == 'T159':
-				ncfile3 = datapath+res+'_'+str(i+301).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+301).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
-				ncfile4 = datapath+res+'_'+str(i+301).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+301).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
-			else:
-				ncfile3 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
-				ncfile4 = datapath+res+'_'+str(i+1).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
+			ncfile3 = datapath+res+'_'+str(i+1+start).zfill(3)+'/'+exp1+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1+start).zfill(3)+'_'+exp1+'_2001_2001_DJFM.nc'
+			ncfile4 = datapath+res+'_'+str(i+1+start).zfill(3)+'/'+exp2+'/2001_2001/DJFM/D12_Clim_'+res+'_'+str(i+1+start).zfill(3)+'_'+exp2+'_2001_2001_DJFM.nc'
 
 			data3.append(Dataset(ncfile3).variables[param][:])
 			data4.append(Dataset(ncfile4).variables[param][:])
 		# in case data has multiple levels, select only the (50000 hPa) 
 			if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
-				if [ res == 'T1279' ]:
-					data3[i] =  data3[i][0,4,:,:]
-					data4[i] =  data4[i][0,4,:,:]
-				else:
-					data3[i] =  data3[i][0,5,:,:]
-					data4[i] =  data4[i][0,5,:,:]
+				data3[i] =  data3[i][0,5,:,:]
+				data4[i] =  data4[i][0,5,:,:]
 			else:
 				data3[i] = data3[i][0,:,:]
 				data4[i] = data4[i][0,:,:]

@@ -93,6 +93,7 @@ if __name__ == '__main__':
 	lats = dataset1.variables[u'lat'][:]
 
 	# add cyclic point to data array and longitude
+	print(np.shape(data_cat1))
 	data_cat1 ,lons = Ngl.add_cyclic(data_cat1, lons)		
 	data_cat2 = Ngl.add_cyclic(data_cat2)	
 

@@ -157,12 +157,12 @@ if __name__ == '__main__':
 		for res in reslist:
 			print('reading files for',res)
 			if res == 'T1279':
-				start = 61
-				end = 100
+				start = 101
+				end = 194
 				bound = 61
 			if res == 'T511':
-				start = 101
-				end = 200
+				start = 201
+				end = 300
 				bound = 200
 			if res == 'T159':
 				start = 301

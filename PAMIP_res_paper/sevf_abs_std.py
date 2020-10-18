@@ -79,14 +79,14 @@ if __name__ == '__main__':
 		for res in reslist:
 			print('reading files for',res)
 			if res == 'T1279':
-				start=60
-				ensnumber = 40
+				start=100
+				ensnumber = 94
 			if res == 'T511':
 				start=100
-				ensnumber = 100
+				ensnumber = 200
 			if res == 'T159':
 				start=300
-				ensnumber = 200
+				ensnumber = 300
 			datapath=basepath+res+'/Experiment_'+exp+'/'
 			data=[]
 

@@ -64,7 +64,7 @@ def bootstrap(xyobs, data1, data2):
 	pvalue = []
 	n = xyobs.shape[0]//2
 	m = xyobs.shape[0]//2
-	B = 20000
+	B = 20
 
 	for bi in tqdm(range(B)):
 		t = dask.delayed(resample)(xyobs,n,m)
@@ -118,12 +118,15 @@ if __name__ == '__main__':
 	#print(reslist)
 	for res in reslist:
 		print('reading files for',res)
-		if res == 'T1279':
-			ensnumber = 100
-		if res == 'T511':
-			ensnumber = 100
-		if res == 'T159':
-			ensnumber = 200
+                if res == 'T1279':
+                        start=101
+                        ensnumber = 94
+                if res == 'T511':
+                        start=201
+                        ensnumber = 100
+                if res == 'T159':
+                        start=301
+                        ensnumber = 100
 		if paramname == 'synact':
 			datapath1=basepath+res+'/Experiment_'+exp1+'/synact/'
 			datapath2=basepath+res+'/Experiment_'+exp2+'/synact/'
@@ -140,8 +143,8 @@ if __name__ == '__main__':
 
 			if str(sys.argv[9]) == "true":
 				for i in range(ensnumber):
-				     ncfile3 = datapath1+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
-				     ncfile4 = datapath2+'3D_'+str(i+1).zfill(3)+'_timstd_'+season+'.nc'
+				     ncfile3 = datapath1+'3D_'+str(i+1+start).zfill(3)+'_timstd_'+season+'.nc'
+				     ncfile4 = datapath2+'3D_'+str(i+1+start).zfill(3)+'_timstd_'+season+'.nc'
 				     dataset3.append(Dataset(ncfile3))
 				     dataset4.append(Dataset(ncfile4))
 		else:
@@ -151,19 +154,15 @@ if __name__ == '__main__':
 			data4=[]
 
 			for i in tqdm(range(ensnumber)):
-				ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
-				ncfile4 = datapath4+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+				ncfile3 = datapath3+'E'+str(i+start).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+				ncfile4 = datapath4+'E'+str(i+start).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
 
 				data3.append(Dataset(ncfile3).variables[param][:])
 				data4.append(Dataset(ncfile4).variables[param][:])
 			# in case data has multiple levels, select only the (50000 hPa) 
 				if paramname == 'Z' or paramname == 'U' or paramname == 'V' or paramname == 'T':
-					if [ res == 'T1279' ]:
-						data3[i] =  data3[i][0,4,:,:]
-						data4[i] =  data4[i][0,4,:,:]
-					else:
-						data3[i] =  data3[i][0,5,:,:]
-						data4[i] =  data4[i][0,5,:,:]
+					data3[i] =  data3[i][0,5,:,:]
+					data4[i] =  data4[i][0,5,:,:]
 				else:
 					data3[i] = data3[i][0,:,:]
 					data4[i] = data4[i][0,:,:]

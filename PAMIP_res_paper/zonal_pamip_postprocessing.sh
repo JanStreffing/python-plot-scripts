@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in T U #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
+for todo in  pch #T_for_doug U_for_doug UP iso_diff #T U
 do
         if [[ "$todo" == "force" ]]; then
                 python forcing.py 11 16 T159,T511,T1279 T2M T2M $in 1 $out 
