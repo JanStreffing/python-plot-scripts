@@ -1,7 +1,7 @@
 #!/bin/bash
 
 in="/p/largedata/hhb19/jstreffi/runtime/oifsamip/"
-out="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
+out="/p/project/chhb20/jstreffi/postprocessing/PAMIP/"
 in_juwels=""
 out_juwels=""
 
@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in  pch #T_for_doug U_for_doug UP iso_diff #T U
+for todo in sin #pch #force #sin_diff  #T U #pch #T_for_doug U_for_doug UP iso_diff #T U
 do
         if [[ "$todo" == "force" ]]; then
                 python forcing.py 11 16 T159,T511,T1279 T2M T2M $in 1 $out 
@@ -29,7 +29,7 @@ do
         fi
 
         if [[ "$todo" == "pch" ]]; then
-                python polar_cap_height.py 11 16 T159,T511,T1279 Z Z $in 9.81 $out true -3,-2.6,-2.2,-1.8,-1.4,-1,-0.6,-0.2,0.2,0.6,1,1.4,1.8,2.2,2.6,3 colorbar_TR_15 14
+                python polar_cap_height.py 11 16 T159 Z Z $in 9.81 $out true -3,-2.6,-2.2,-1.8,-1.4,-1,-0.6,-0.2,0.2,0.6,1,1.4,1.8,2.2,2.6,3 colorbar_TR_15 14
         fi
 
 	# Z zonal plots 
@@ -60,12 +60,17 @@ do
  
        if [[ "$todo" == "iso_diff" ]]; then
                 python isohypse_diff.py
-		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/isohypse_diff.png $out
+		cp /p/largedata/hhb19/jstreffi/runtime/oifsamip/APPLICATE/isohypse_diff.png $out
 	fi
 
         if [[ "$todo" == "sin_diff" ]]; then
-                python sinuosity_diff.py
-		cp /mnt/lustre01/work/ba1035/a270092/runtime/oifsamip/APPLICATE/sinuosity_diff.png $out
+                python sinuosity_diff.py 11 16 T159,T511,T1279 T T $in 1 $out true
+		cp /p/largedata/hhb19/jstreffi/runtime/oifsamip/APPLICATE/sinuosity_diff*.png $out
+	fi
+
+	if [[ "$todo" == "sin" ]]; then
+                python sinuosity3.py 11 16 T159,T511,T1279 T T $in 1 $out true
+		cp /p/largedata/hhb19/jstreffi/runtime/oifsamip/APPLICATE/sinuosity*.png $out
 	fi
 
 	if [[ "$todo" == "T_for_doug" ]]; then

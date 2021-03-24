@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in U T2M MSL Z #sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
+for todo in Z #sevf_abs #sevf #DurationEvents #InstBlock ExtraBlock #InstBlock #T2M MSL Z #haus U SD forcing synact
 do
 
 	# Synoptic Eddy Vorticity Forcing
@@ -54,7 +54,7 @@ do
 
 	# z500 hPa polar plots 
 	if [[ "$todo" == "Z" ]]; then
-		python nh_stereo_era5.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -62,-54,-46,-38,-30,-22,-14,-6,6,14,22,30,38,46,54,62 colorbar_TR_15 14
+		python nh_stereo_era5.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -65,-55,-45,-35,-25,-15,-5,5,15,25,35,45,55,65 colorbar_TR_15 11
 	fi
 
 

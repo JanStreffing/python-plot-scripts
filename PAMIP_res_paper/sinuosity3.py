@@ -23,14 +23,12 @@ modelfactor=1
 exp1=str(sys.argv[1])
 exp2=str(sys.argv[2])
 reslist=map(str, sys.argv[3].split(','))
-itimes=0
-fig =  plt.figure(figsize=(9,6))
 
 sin = {}
 std = {}
 
 
-for area in ['NH', 'AT', 'AS', 'AM']:
+for area in ['NH']:
     for exp in [exp1,exp2]:
         sin[exp] = {}
         std[exp] = {}
@@ -51,44 +49,39 @@ for area in ['NH', 'AT', 'AS', 'AM']:
                i=i+1
             f.close()
 
-    ax = plt.subplot(2,2,itimes+1)
 
     drange2 = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
     N = 12
     drange = pd.date_range("2000-06", periods=N, freq="MS")
 
-    plot = {}
+    fig =  plt.figure(figsize=(9,5))
+    ax = plt.subplot(1,1,1)
     for res in reslist:
         print('Plotting '+area+' '+res)
-        if res == 'T159':
-            cl = 'Blue'
-        if res == 'T511':
-            cl = 'Orange'
-        if res == 'T1279':
-            cl = 'Red'
-        plot[res],=ax.plot(drange,((sin[exp2][res]-sin[exp1][res])/sin[exp2][res]*100),linewidth=3,color=cl)
-        plt.fill_between(drange,((sin[exp2][res]-sin[exp1][res]-std[exp2][res]-std[exp1][res])/sin[exp1][res])*100,((sin[exp2][res]-sin[exp1][res]+std[exp2][res]+std[exp1][res])/sin[exp1][res]*100),facecolor=cl,alpha=0.15)
-    plt.xticks(rotation=30)
-    #ax.xaxis_date()
-    ax.set_xticks(drange)
-    ax.tick_params(labelsize=9)
+        if res=='T159':
+            linestyle='solid'
+        elif res=='T511':
+            linestyle='dotted'
+        elif res=='T1279':
+            linestyle='dashed'
+
+        cl1 = 'Red'
+        cl2 = 'DarkRed'
+        plot,=ax.plot(drange,(sin[exp1][res]),linewidth=3,color=cl1,label='11:pdSST-pdSIC '+res,linestyle=linestyle)
+        plot,=ax.plot(drange,(sin[exp2][res]),linewidth=3,color=cl2,label='16:pdSST-fuSICArc '+res,linestyle=linestyle)
+        plt.ylim([1.1, 1.8])
+        plt.legend(loc='upper left',prop={'size':11})
+        plt.fill_between(drange,((sin[exp1][res]-std[exp1][res])),(sin[exp1][res]+std[exp1][res]),facecolor=cl1,alpha=0.17)
+        plt.fill_between(drange,((sin[exp2][res]-std[exp2][res])),(sin[exp2][res]+std[exp2][res]),facecolor=cl2,alpha=0.17)
+        plt.xticks(rotation=30)
+        #ax.xaxis_date()
+        ax.set_xticks(drange)
+        ax.tick_params(labelsize=11)
 
 
-    plt.axhline(0, color='black', lw=1) 
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
-    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%b"))
-    if area == 'NH':
-        ax.set_title('a) Northern Hemisphere', loc='left', fontsize=17)
-    if area == 'AT':
-        ax.set_title('b) Europe', loc='left', fontsize=17)
-        plt.legend([plot['T159'],plot['T511'],plot['T1279']],['T159','T511','T1279'],loc=1,prop={'size':11})
-    if area == 'AM':
-        ax.set_title('c) North America', loc='left', fontsize=17)
-    if area == 'AS':
-        ax.set_title('d) Asia', loc='left', fontsize=17)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter("%b"))
 
-    itimes=itimes+1
-
-fig.text(0.01, 0.5, 'Change of Sinuosity [$\%$]', fontsize=18, va='center', rotation=90)
-fig.subplots_adjust(hspace=0.33, wspace = 0.15, left = 0.08, right = 0.92, top = 0.92, bottom = 0.06)
-fig.savefig(datapath+'sinuosity_diff.png',dpi=900)
+    ax.set_title('Sinuosity Index, Northern Hemisphere', loc='left', fontsize=17)
+    fig.subplots_adjust(hspace=0.33, wspace = 0.15, left = 0.08, right = 0.92, top = 0.92, bottom = 0.08)
+    fig.savefig('/p/project/chhb20/jstreffi/postprocessing/PAMIP/sinuosity.png',dpi=900)

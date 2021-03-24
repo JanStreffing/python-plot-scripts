@@ -22,7 +22,7 @@ output_path="/p/project/chhb19/jstreffi/postprocessing/PAMIP/"
 #   Fontsize of colorbar ticks
 
 
-for todo in Z #ExtraBlock # U Z T2M sevf synact sevf_abs haus InstBlock SD
+for todo in U #NAO #ExtraBlock #sevf synact sevf_abs haus InstBlock SD
 do
 
 	# Synoptic Eddy Vorticity Forcing
@@ -39,50 +39,50 @@ do
 
 	# 2D blocking frequency plots (Davini2012)
 	if [[ "$todo" == "InstBlock" ]]; then
-		python blocking_bootstrap.py 11 16 T159,T511,T1279 InstBlock InstBlock $input_path 1 $output_path true -3.5,-3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3,3.5 colorbar_TR_15 17 
+		python blocking_bootstrap_abs.py 11 16 T159,T511,T1279 InstBlock InstBlock $input_path 1 $output_path true -3.5,-3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3,3.5 colorbar_TR_15 17 
 	fi
 
 	# 2D blocking frequency plots with extra souther condition  (Davini2012)
 	if [[ "$todo" == "ExtraBlock" ]]; then
-		python blocking_bootstrap.py 11 16 T159,T511,T1279 ExtraBlock ExtraBlock $input_path 1 $output_path true -3.5,-3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3,3.5 colorbar_TR_15 17 
+		python blocking_bootstrap_abs.py 11 16 T159,T511,T1279 ExtraBlock ExtraBlock $input_path 1 $output_path true -3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3 colorbar_TR_15 17 
 	fi
 
 	# 2D blocking event duration plots (Davini2012)
 	if [[ "$todo" == "DurationEvents" ]]; then
-		python blocking_bootstrap.py 11 16 T159,T511,T1279 DurationEvents DurationEvents $input_path 1 $output_path true -3.5,-3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3,3.5 colorbar_TR_15 17 
+		python blocking_bootstrap_abs.py 11 16 T159,T511,T1279 DurationEvents DurationEvents $input_path 1 $output_path true -3.5,-3,-2.5,-2,-1.5,-1,-0.5,0.5,1,1.5,2,2.5,3,3.5 colorbar_TR_15 17 
 	fi
 
 	# z500 hPa polar plots 
 	if [[ "$todo" == "Z" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -22,-18,-14,-10,-6,-2,2,6,10,14,18,22 colorbar_TR_15 18 
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 Z Z $input_path 9.81 $output_path true -22,-18,-14,-10,-6,-2,2,6,10,14,18,22 colorbar_TR_15 18 
 	fi
 
 
 	# t2m hPa polar plots 
 	if [[ "$todo" == "T2M" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 T2M T2M $input_path 1 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 T2M T2M $input_path 1 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
 	fi
 
 
 	# MSL polar plots
 	if [[ "$todo" == "MSL" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 MSL MSL $input_path 1 $output_path true -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 17 
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 MSL MSL $input_path 1 $output_path true -300,-260,-220,-180,-140,-100,-60,-20,20,60,100,140,180,220,260,300 colorbar_TR_15 17 
 	fi
 
 
 	# U polar plots
 	if [[ "$todo" == "U" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 U U $input_path 1 $output_path true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18  
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 U U $input_path 1 $output_path true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18  
 	fi
 
 	# V polar plots
 	if [[ "$todo" == "V" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 V V $input_path 1 $output_path true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18 
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 V V $input_path 1 $output_path true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-.3,-.1,.1,.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 18 
 	fi
 
 	# synoptic activity polar plots
 	if [[ "$todo" == "synact" ]]; then
-		python nh_stereo_diff_bootstrap.py 11 16 T159,T511,T1279 Z synact $input_path 9.81 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
+		python nh_stereo_abs_bootstrap.py 11 16 T159,T511,T1279 Z synact $input_path 9.81 $output_path true -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 18 
 	fi
 
 	if [[ "$todo" == "SD" ]]; then
@@ -94,13 +94,13 @@ do
 	fi
 
 	if [[ "$todo" == "NAO" ]]; then
-		for season in DJF MAM JJA SON
+		for season in DJF
 		do
 			for res in T511 T159 T1279; do
-				python nao_ngl_diff.py 11 16 $res MSL MSL $input_path 1 $output_path false -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 $season
+				#python nao_ngl_diff.py 11 16 $res MSL MSL $input_path 1 $output_path false -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 $season
 				#-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8
 				python nao_ngl.py 11 1 $res MSL MSL $input_path 1 $output_path false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
-				python nao_ngl.py 16 1 $res MSL MSL $input_path 1 $output_path false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
+				#python nao_ngl.py 16 1 $res MSL MSL $input_path 1 $output_path false -3,-2.5,-2,-1.5,-1,-.7,-.4,-.2,-.1,.1,.2,.4,.7,1,1.5,2,2.5,3 $season
 			done
 		done
 	fi

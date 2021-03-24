@@ -63,7 +63,7 @@ if __name__ == '__main__':
 	mapticks=map(float, sys.argv[10].split(','))
 	reslist=map(str, sys.argv[3].split(','))
 	itimes=0
-	fig =  plt.figure(figsize=(9,5.5))
+	fig =  plt.figure(figsize=(9,4.0))
 	datadict1 = {}
 	datadict2 = {}
 	datadict3 = {}
@@ -71,11 +71,16 @@ if __name__ == '__main__':
 
 	for res in reslist:
 		if res == 'T1279':
-			ensnumber = 100
+			start = 101
+			end = 200
 		if res == 'T511':
-			ensnumber = 100
+			start = 201
+			end = 300
 		if res == 'T159':
-			ensnumber = 200
+			start = 301
+			end = 600
+
+		ensnumber = end-start+1
 
 
 		datapath3=basepath+res+'/Experiment_'+exp1+'/'
@@ -84,8 +89,8 @@ if __name__ == '__main__':
 		data4=[]
 
 		for i in tqdm(range(ensnumber)):
-			ncfile3 = datapath3+'E'+str(i+1).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean_11.nc'
-                        ncfile4 = datapath4+paramname+'_DJFM_l.nc'
+			ncfile3 = datapath3+'E'+str(i+start).zfill(3)+'/outdata/oifs/djfm_mean/'+paramname+'_djfm_mean.nc'
+                        ncfile4 = datapath4+paramname+'_DJFM.nc'
 
 			data3.append(Dataset(ncfile3).variables[param][:])
 			data4.append(Dataset(ncfile4).variables[param][:])
@@ -106,6 +111,11 @@ if __name__ == '__main__':
 			res2= res2-273.15
 			res3= res3-273.15
 			res4= res4-273.15
+		if param == 'Z':
+			res1= res1/100
+			res2= res2/100
+			res3= res3/100
+			res4= res4/100
 
                 lats = Dataset(ncfile3).variables[u'lat'][:]
                 levs = Dataset(ncfile3).variables[u'plev'][:]
@@ -127,20 +137,29 @@ if __name__ == '__main__':
 			data4 = datadict4[plot]
 
 		# Set axis labeling and sharing
-		ax=plt.subplot(2,3,itimes+1)
+		ax=plt.subplot(1,3,itimes+1)
 		plt.tick_params(labelsize=12)
 		if itimes % 3 != 0:
-			plt.setp(ax.get_yticklabels(), visible=False)
+		        plt.setp(ax.get_yticklabels(), visible=False)
 
-		if itimes < 3: 
-			plt.setp(ax.get_xticklabels(), visible=False)
+		#if itimes < 3: 
+		plt.setp(ax.get_xticklabels(), visible=True)
 	
 		cmap_TR.set_over("darkred")
 		cmap_TR.set_under("deeppink")
 
 		# Plotting
 		im=plt.contourf(lats, levs/100, data1-data2, levels=mapticks, cmap=cmap_TR, extend='both')
-	
+
+		if param == 'Z':
+                        levels=np.arange(0, 1000, 50)
+                else:
+                        levels=np.arange(-80, 60, 5)
+
+                cs=plt.contour(lats, levs/100, data2, colors='k', levels=levels,linewidths=0.7)
+                plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
+
+
 		plt.ylim([10,1000])
 		plt.gca().invert_yaxis()
 		plt.xlim([20,89])
@@ -153,11 +172,13 @@ if __name__ == '__main__':
         	itimes=itimes+1
 
 if paramname == 'T':
-	fig.text(0.97, 0.5, 'Zonal mean temperature anomaly [$K$]', fontsize=18, va='center', rotation=90)
+	fig.text(0.97, 0.5, 'Zonal mean temperature bias [$K$]', fontsize=18, va='center', rotation=90)
 if paramname == 'U':
-	fig.text(0.97, 0.5, 'Zonal mean zonal wind anomaly [$m/s$]', fontsize=18, va='center', rotation=90)
+	fig.text(0.97, 0.5, 'Zonal mean zonal wind bias [$m/s$]', fontsize=17, va='center', rotation=90)
+if paramname == 'U':
+	fig.text(0.97, 0.5, 'Zonal mean geopotentail bias [$hPa$]', fontsize=17, va='center', rotation=90)
 
-fig.subplots_adjust(hspace=0.3, wspace = 0.12, left = 0.1, right = 0.84, top = 0.86, bottom = 0.14)
+fig.subplots_adjust(hspace=0.3, wspace = 0.12, left = 0.1, right = 0.84, top = 0.74, bottom = 0.26)
 
 #for label in cbar_ax.xaxis.get_ticklabels()[::2]:
 #    label.set_visible(False)

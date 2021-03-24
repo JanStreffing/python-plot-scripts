@@ -108,7 +108,7 @@ if __name__ == '__main__':
 	for res in reslist:
 		if res == 'T1279':
 			start = 101
-			end = 194
+			end = 200
 		if res == 'T511':
 			start = 201
 			end = 300
@@ -133,26 +133,18 @@ if __name__ == '__main__':
 			data3[i] =  data3[i][0,:,:,:]
 			data4[i] =  data4[i][0,:,:,:]
 
-		data1 = np.mean(np.asarray(data3),axis=0)
-		data2 = np.mean(np.asarray(data4),axis=0)
 		
-		print(np.asarray(data1).shape)
-		print(np.asarray(data3).shape)
-		res1=np.mean(data1,axis=2)
-		res2=np.mean(data2,axis=2)
 		res3=np.mean(data3,axis=3)
 		res4=np.mean(data4,axis=3)
-		#import pdb
-                #pdb.set_trace()
 		if param == 'T':
-			res1= res1-273.15
-			res2= res2-273.15
 			res3= res3-273.15
 			res4= res4-273.15
 
                 lats = Dataset(ncfile3).variables[u'lat'][:]
                 levs = Dataset(ncfile3).variables[u'plev'][:]
-
+		datadict3[res] = res3 
+		datadict4[res] = res4 
+	""" Old method with differance plots
 		datadict1[res] = res1 
 		datadict2[res] = res2
 		datadict3[res] = res3 
@@ -182,6 +174,30 @@ if __name__ == '__main__':
 			data2 = datadict2['T1279']-datadict1['T1279']
 			data3 = np.asarray(datadict4['T511'])-np.asarray(datadict3['T511'])
 			data4 = np.asarray(datadict4['T1279'])-np.asarray(datadict3['T1279'])
+	"""
+
+			
+	for plot in [ 'T159 total', 'T511', 'T1279', 'T159 1st', 'T159 2nd', 'T159 3rd' ]:
+
+
+		if plot == 'T159 total':
+			data3 = datadict3['T159']
+			data4 = datadict4['T159']
+		if plot == 'T159 1st':
+			data3 = datadict3['T159'][:100]
+			data4 = datadict4['T159'][:100]
+		if plot == 'T159 2nd':
+			data3 = datadict3['T159'][100:200]
+			data4 = datadict4['T159'][100:200]
+		if plot == 'T159 3rd':
+			data3 = datadict3['T159'][200:300]
+			data4 = datadict4['T159'][200:300]
+		if plot == 'T511' or plot == 'T1279':
+			data3 = datadict3[plot]
+			data4 = datadict4[plot]
+
+		data1 = np.mean(np.asarray(data3),axis=0)
+                data2 = np.mean(np.asarray(data4),axis=0)
 
 		# Calculating Bootstrap test
 		xyobs = np.asarray(np.concatenate([data3,data4]))
@@ -211,14 +227,13 @@ if __name__ == '__main__':
 		plt.xlim([20,89])
 
 
-		if plot == 'T159' or plot == 'T511' or plot == 'T1279':
-			if paramname == "T":
-				levels=np.arange(-80, 60, 10)
-			else:
-				levels=np.arange(-80, 60, 5)
-			cs=plt.contour(lats, levs/100, data1, colors='k', levels=levels,linewidths=0.7)
+                if paramname == "T":
+                        levels=np.arange(-80, 60, 10)
+                else:
+                        levels=np.arange(-80, 60, 5)
+                cs=plt.contour(lats, levs/100, data1, colors='k', levels=levels,linewidths=0.7)
 
-			plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
+                plt.clabel(cs, inline=1, fontsize=8, fmt='%2.0f')
 
 		if str(sys.argv[9]) == "true":
 			wl=plt.pcolor(lats, levs/100, np.ma.asarray(data_sig), hatch='..', zorder=2, alpha=0, linewidth=0.5)

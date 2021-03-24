@@ -160,7 +160,7 @@ if __name__ == '__main__':
 			fig.text(0.01, 0.5, 'Net surface heat flux response [$W/m^2$]', fontsize=10, va='center', rotation=90)
                         ax.set_ylim(ymin=10,ymax=-20)
 
-		fig.text(0.95, 0.5, 'Sea ice extend reduction [$10^6 km^2$]', fontsize=10, va='center', rotation=90)
+		fig.text(0.95, 0.5, 'Sea ice extent reduction [$10^6 km^2$]', fontsize=10, va='center', rotation=90)
 		plt.xticks(rotation=30)
 		ax.set_xticks(drange)
 		ax.tick_params(labelsize=9)

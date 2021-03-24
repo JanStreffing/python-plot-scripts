@@ -21,7 +21,7 @@ out_juwels=""
 #   Fontsize of colorbar ticks
 
 
-for todo in Z T U #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
+for todo in Z #pch #sin_diff T_for_doug U_for_doug sin_diff T U UP iso_diff
 do
         if [[ "$todo" == "force" ]]; then
                 python forcing.py 11 16 T159,T511,T1279 T2M T2M $in 1 $out 
@@ -34,7 +34,7 @@ do
 
 	# Z zonal plots 
 	if [[ "$todo" == "Z" ]]; then
-		python zonal_era5.py 11 16 T159,T511,T1279 Z Z $in 1 $out true  -7,-5,-3,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,3,5,7 colorbar_TR_70 14
+		python zonal_era5.py 11 16 T159,T511,T1279 Z Z $in 1 $out true  -70,-50,-30,-10,-5,-3,-1,1,3,5,10,30,50,70 colorbar_TR_70 14
 		#-2,-1.5,-1,-0.5,-0.2,0.2,0.5,1,1.5,2
 	fi
 
@@ -46,7 +46,7 @@ do
 
 	# U zonal plots
 	if [[ "$todo" == "U" ]]; then
-		python zonal_era5.py 11 16 T159,T511,T1279 U U $in 1 $out true -1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5 colorbar_TR_15 14
+		python zonal_era5.py 11 16 T159,T511,T1279 U U $in 1 $out true -5,-4,-3,-2,-1,-0.5,-0.3,-0.1,0.1,0.3,0.5,1,2,3,4,5 colorbar_TR_70 14
 		#-1,-0.75,-0.5,-0.25,-0.1,0.1,0.25,0.5,0.75,1 
 	fi
 	

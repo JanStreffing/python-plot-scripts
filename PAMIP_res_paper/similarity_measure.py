@@ -105,7 +105,7 @@ if __name__ == '__main__':
 	for resolution in reslist:
 		if resolution == 'T1279':
 			start = 101
-			ensnumber = 94
+			ensnumber = 100
 		elif resolution == 'T511':
 			start = 201
 			ensnumber = 100

@@ -43,7 +43,10 @@ np.set_printoptions(threshold=sys.maxsize)
 
 
 def read_inner(ncfile1, param):
-	data1 = Dataset(ncfile1).variables[param][:]
+        try:
+	    data1 = Dataset(ncfile1).variables[param][:]
+        except:
+            print(ncfile1)
 	return data1
 
 def read_file_par(ensnumber,datapath1,paramname,param,start):
@@ -158,15 +161,15 @@ if __name__ == '__main__':
 			print('reading files for',res)
 			if res == 'T1279':
 				start = 101
-				end = 194
+				end = 200
 				bound = 61
 			if res == 'T511':
 				start = 201
 				end = 300
-				bound = 200
+				bound = 20
 			if res == 'T159':
 				start = 301
-				end = 600
+				end = 400
 				bound = 1
 			bound=bound*32 # Determines minimum size to count as extreme event
 			min_area = 500000*1000000
@@ -178,7 +181,7 @@ if __name__ == '__main__':
 			data2 = read_file_par(ensnumber,datapath2,paramname,param,start)
 			area_path = basepath+res+'/gridarea/'+res+'_'+area+'_gridarea.nc'
 			cell_area = Dataset(area_path).variables['cell_area'][:]
-
+	
 			data1 = np.squeeze(data1)
 			data2 = np.squeeze(data2)
 
@@ -192,6 +195,8 @@ if __name__ == '__main__':
 			val1 = np.squeeze(np.asarray(val))[:,0]
 			val2 = np.squeeze(np.asarray(val))[:,1]
 			
+			#import pdb
+			#pdb.set_trace()
 			#inn1, inn2 = time_assoc(data1, data2, ensnumber) #old routine
 			area1, area2 = area_calc(data1, data2, ensnumber, cell_area)
 

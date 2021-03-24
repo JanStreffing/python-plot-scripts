@@ -82,7 +82,7 @@ if __name__ == '__main__':
 		print('reading files for',res)
 		if res == 'T1279':
 			first = 101
-			last = 194
+			last = 200
 		if res == 'T511':
 			first = 201
 			last = 300
@@ -183,11 +183,11 @@ if __name__ == '__main__':
 		itimes=itimes+1
 
 if paramname == 'T2M':
-	fig.text(0.94, 0.5, 'Temperature anomaly [$K$]', fontsize=14, va='center', rotation=90)
+	fig.text(0.94, 0.5, 'Temperature anomaly [$K$]', fontsize=int(sys.argv[12]), va='center', rotation=90)
 if paramname == 'Z':
-	fig.text(0.955, 0.5, '500 hPa geopotential height anomaly [$m$]', fontsize=13, va='center', rotation=90)
+	fig.text(0.955, 0.5, '500 hPa geopotential height anomaly [$m$]', fontsize=10, va='center', rotation=90)
 if paramname == 'MSL':
-	fig.text(0.97, 0.5, 'Mean surface level pressure anomaly [$Pa$]', fontsize=13, va='center', rotation=90)
+	fig.text(0.97, 0.5, 'Mean surface level pressure anomaly [$Pa$]', fontsize=int(sys.argv[12]), va='center', rotation=90)
 
 fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0, right = 0.8, top = 1, bottom = 0)
 #fig.subplots_adjust(hspace=-0.1, wspace = 0.1, left = 0.1, right = 0.75, top = 0.95, bottom = 0.05)
